@@ -1,0 +1,113 @@
+.check__all {
+    position: relative;
+    height: 51px;
+    background-color: #ffffff;
+    border-top: 1px solid #eaebed;
+}
+.check__all .inner {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    min-width: 0;
+    padding: 11px 18px;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+}
+.check__all .check__box {
+    flex-grow: 1;
+}
+.btn__delete {
+    flex-shrink: 0;
+    padding: 0 8px;
+    border: 1px solid #d9dde0;
+    background-color: #ffffff;
+    border-radius: 2px;
+    line-height: 28px;
+    letter-spacing: -0.5px;
+    color: #242424;
+    vertical-align: top;
+}
+.btn__check {
+    position: relative;
+    font-size: 15px;
+    line-height: 22px;
+    font-weight: bold;
+    color: #222222;
+    text-align: left;
+    vertical-align: top;
+    z-index: 10;
+}
+.btn__delete .ico__delete {
+    display: inline-block;
+    margin: 6px 3px 0 -3px;
+    vertical-align: top;
+}
+.btn__check .ico__check {
+    display: inline-block;
+    margin: 2px;
+    vertical-align: top;
+}
+.clicked {
+    border-color: #03c75a !important;
+    background-color: #03c75a !important;
+}
+.path {
+    fill: #ffffff;
+}
+.btn__check .check__ {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    background-color: #ffffff;
+    border: 1px solid #c7cacd;
+    border-radius: 2px;
+    vertical-align: top;
+}
+.total__cartInfo {
+    border-top: 1px solid #222222;
+    padding: 22px 0;
+}
+
+.list__price {
+    padding-bottom: 18px;
+}
+
+.price__area {
+    display: flex;
+    font-size: 15px;
+    line-height: 18px;
+    margin-bottom: 13px;
+}
+.price__area .title{
+   color: #333333;
+   letter-spacing: -0.5px;
+}
+
+.price__area em {
+    flex-grow: 1;
+    padding-left: 10px;
+    white-space: nowrap;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333333;
+    letter-spacing: -0.5px;
+    text-align: right;
+}
+.price__area em .num{
+    color: #f85151;
+}
+.price__area em .num__total{
+    color: #00c63a;
+}
+.link__button {
+    display: block;
+    background-color: #03c75a;
+    border-radius: 2px;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 45px;
+    text-align: center;
+    color: #ffffff;
+}

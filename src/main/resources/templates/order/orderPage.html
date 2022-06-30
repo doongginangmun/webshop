@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header" />
+<link rel="stylesheet" th:href="@{/css/orderPage.css}">
+<link rel="stylesheet" th:href="@{/css/selectButton.css}">
+<body>
+<div class="container">
+    <div th:replace="fragments/bodyHeader :: bodyHeader"/>
+        <div class="check__all">
+            <div class="inner">
+                <div class="check__box">
+                    <button type="button" class="btn__check" onclick="selectAll()" >
+                    <span class="check__">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="ico__check">
+                            <path d="M12.945 4L14.1 5.154 6.387 12.8 2 8.4l1.155-1.153 3.232 3.246L12.945 4z" fill="#C7CACD">
+                            </path>
+                        </svg>
+                    </span>
+                        전체 선택
+                    </button>
+                </div>
+            </div>
+        </div>
+        <form th:action="@{/order}" id="orderForm" th:object="${OrderRequestForm}"  method="post">
+            <div class="order_content">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>상품 이름</th>
+                    <th>상품 주문가격</th>
+                    <th>상품 주문수량</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${itemList}">
+                    <td>
+                        <input type="checkbox" class="chkbox" name="chk"
+                               th:field="*{chk}" th:value="${item.id}" th:onclick="selectChkBox(event)">
+                    </td>
+                        <td th:text="${item.name}"></td>
+                        <td id="itemPrice" th:text="${item.price}"></td>
+                        <td th:text="${item.count}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="cutting_line cutting_line_v2">
+                <span class="ico_scissors"></span>
+                <span class="shadow_left"></span>
+                <span class="shadow_right"></span>
+            </div>
+                <div class="discount_wrap">
+                    <div class="discount_priceInfo">
+                        <div class="">
+                            <h4>
+                                <strong>쿠폰 할인</strong>
+                            </h4>
+                        </div>
+                        <!-- SELECT -->
+                        <div>
+                            <div>쿠폰</div>
+                            <select th:field="*{couponId}" class="form-select" th:onchange="handleOnChange(this)">
+                                <option value="0">==보유 쿠폰 선택==</option>
+                                <option th:each="coupon : ${coupons}" th:value="${coupon.coupon.id}"
+                                        th:text="${coupon.coupon.name}">name</option>
+                            </select>
+                        </div>
+                        <div class="total__cartInfo">
+                            <div class="list__price">
+                                <div class="sub__price">
+                                    <div class="price__area">
+                                        <span class="title">총 상품선택금액</span>
+                                        <em>
+                                            <span  id="total_itemPrice">0 원</span>
+                                        </em>
+                                    </div>
+                                    <div class="price__area">
+                                        <span class="title">총 할인금액</span>
+                                        <em>
+                                            <span class="num" id="num">0 원</span>
+                                        </em>
+                                    </div>
+                                </div>
+                                <div class="total__area">
+                                    <div class="price__area">
+                                        <span class="title">총 주문금액</span>
+                                        <em>
+                                            <span class="num__total" id="total__price">0 원</span>
+                                        </em>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="payment_agree_wrap">
+                <button class="btn_payment_doPayButton">결제하기</button>
+            </div>
+        </form>
+</div>
+</body>
+<script th:inline="javascript">
+const msg = [[${msg}]];
+const span = document.querySelector("span.check__");
+const path = document.querySelector("svg.ico__check:first-child path");
+const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+const result = [...checkboxes];
+let num = document.querySelector("#num");
+let discountPrice = 0;
+let itemPrice = 0;
+
+
+/*쿠폰 할인 금액 가져오기*/
+function handleOnChange(e) {
+
+  /*선택된 쿠폰 데이터의 텍스트에서 숫자만 추출*/
+  const text = e.options[e.selectedIndex].text;
+  let regex = /[^0-9]/g;
+  let result = parseInt(text.replace(regex, ""));
+
+  /* 쿠폰을 선택하지 않으면 0*/
+  if(isNaN(result)==true) {
+     discountPrice = 0;
+  } else {
+     discountPrice = result;
+  }
+  calcInnerText(itemPrice);
+ }
+ /*예상 할인 금액 계산*/
+ function calcCoupon() {
+  if(itemPrice <= 0) {
+     return 0;
+  }
+  if(discountPrice > 100) {
+     return discountPrice;
+  }else {
+     return itemPrice/100.0 * discountPrice;
+  }
+}
+
+/*총 주문금액 = 총 상품선택금액 - 할인예상금액*/
+function calcTotalPrice(itemPrice, discountPrice) {
+    if(itemPrice-discountPrice<=0) {
+        total__price.innerText = '0 원';
+    }else {
+        total__price.innerText = itemPrice - discountPrice + ' 원';
+    }
+}
+/*계산한 금액 화면에 출력*/
+function calcInnerText(itemPrice) {
+        let temp = calcCoupon();
+        total_itemPrice.innerText = itemPrice + ' 원';
+        num.innerText = (temp === 0) ?  '0 원' : '-' + temp + ' 원';
+        calcTotalPrice(itemPrice, temp);
+}
+if(msg === '주문할 상품은 한가지 이상 선택 해주세요.') {
+    alert("주문할 상품은 한가지 이상 선택 해주세요.");
+}
+
+/* 전체선택버튼 on/off */
+function selectAll(e) {
+    span.classList.toggle("clicked");
+    path.classList.toggle("path");
+    itemPrice = 0;
+    if(result.filter(box => box.checked).length === checkboxes.length) {
+        checkboxes.forEach(input => {input.checked = false });
+        calcInnerText(itemPrice);
+    } else {
+        checkboxes.forEach(input => {input.checked = true });
+        let itemPrices = document.querySelectorAll("#itemPrice");
+        let formatTotalPrice = "";
+        for(var i=0; i<itemPrices.length; i++) {
+            itemPrice += parseInt(itemPrices[i].innerText);
+        }
+        calcInnerText(itemPrice);
+    }
+}
+
+/* checkbox 선택시 전체선택버튼 on/off */
+function selectChkBox(event) {
+    let price = 0;
+    if(event.target.checked) {
+        price = parseInt(event.path[2].cells[2].innerText);
+        itemPrice += price;
+        calcInnerText(itemPrice);
+    } else {
+        price = parseInt(event.path[2].cells[2].innerText);
+        itemPrice -= price;
+        calcInnerText(itemPrice);
+    }
+
+    if(result.filter(box => box.checked).length != checkboxes.length) {
+       span.classList.remove("clicked");
+       path.classList.remove("path");
+    } else {
+        span.classList.add("clicked");
+        path.classList.add("path");
+    }
+}
+</script >
+</html>

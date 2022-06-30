@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header" />
+<link rel="stylesheet" th:href="@{/css/couponIssued.css?after}">
+<body>
+<div class="container">
+    <div th:replace="fragments/bodyHeader :: bodyHeader"/>
+    <p th:text="|현재 발급할 수 있는 쿠폰이 없습니다.|" th:if="${coupons.totalPages==0}"></p>
+    <div th:unless="${coupons.totalPages==0}">
+        <div class="coupons__wrapper">
+            <div th:each="coupon : ${coupons}">
+                    <img th:src="@{/img/defaultCoupon.png}"/>
+                    <p th:text="${coupon.name}"></p>
+                    <form id="issuedCoupon" th:action="@{'/coupon/' + ${coupon.id} + '/issued'}" method="post">
+                        <button class="btn btn-primary">담기</button>
+                    </form>
+                </form>
+            </div>
+        </div>
+        <div class="page_wrap">
+            <div class="page_nation">
+                <a th:each="page: ${#numbers.sequence(1, coupons.totalPages )}"
+                   th:class="${page==coupons.number+1} ? active"
+                   th:text="${page}" th:href="@{/coupons(page=${page})}"></a>
+            </div>
+        </div>
+    </div>
+    <div th:replace="fragments/footer :: footer"/>
+</div> <!-- /container -->
+</body>
+<script th:inline="javascript">
+const msg = [[${msg}]];
+if(msg === '이미 발급 받은 쿠폰입니다.') {
+    alert("이미 발급 받은 쿠폰입니다.");
+}
+</script>
+</html>

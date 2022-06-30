@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns="http://www.w3.org/1999/html">
+<head th:replace="fragments/header :: header">
+    <title>Hello</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<div class="container">
+    <div th:replace="fragments/bodyHeader :: bodyHeader" />
+    <div class="jumbotron">
+        <div sec:authorize="isAuthenticated()">
+            <p th:text="|${loginUsername}님 환영합니다.|"></p>
+        </div>
+        <p class="lead">회원 기능</p>
+        <p>
+            <a class="btn btn-lg btn-secondary" href="/users/new"
+               sec:authorize="isAnonymous()">회원 가입</a>
+            <a class="btn btn-lg btn-secondary" href="/signin"
+               sec:authorize="isAnonymous()">로그인</a>
+            <a class="btn btn-lg btn-secondary" href="/users"
+               sec:authorize="hasAuthority('ROLE_ADMIN')">회원 목록</a>
+            <a class="btn btn-lg btn-secondary" href="/coupons"
+               sec:authorize="hasAuthority('ROLE_USER')">쿠폰받기</a>
+            <a class="btn btn-lg btn-secondary" href="/usercoupons"
+               sec:authorize="hasAuthority('ROLE_USER')">쿠폰함</a>
+            <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()">
+                <button class="btn btn-lg btn-secondary" type="submit">로그 아웃</button>
+            </form>
+        </p>
+        <p class="lead"
+           sec:authorize="hasAuthority('ROLE_ADMIN')">쿠폰 기능</p>
+        <p>
+            <a class="btn btn-lg btn-secondary" href="/coupon/new"
+                sec:authorize="hasAuthority('ROLE_ADMIN')">쿠폰등록</a>
+        </p>
+        <p class="lead" sec:authorize="hasAuthority('ROLE_ADMIN')">상품 기능</p>
+        <p>
+            <a class="btn btn-lg btn-dark" href="/items/new"
+               sec:authorize="hasAuthority('ROLE_ADMIN')">상품 등록</a>
+            <a class="btn btn-lg btn-dark" href="/items"
+               sec:authorize="hasAuthority('ROLE_ADMIN')">상품 목록</a>
+        </p>
+        <p class="lead"
+           sec:authorize="hasAuthority('ROLE_USER')">주문 기능</p>
+        <p>
+            <a class="btn btn-lg btn-info" href="/shopping"
+               sec:authorize="hasAuthority('ROLE_USER')">상품 주문</a>
+            <a class="btn btn-lg btn-info" href="/orderList"
+               sec:authorize="hasAuthority('ROLE_USER')">주문 내역</a>
+        </p>
+        <p class="lead"
+           sec:authorize="hasAuthority('ROLE_USER')">장바구니 기능</p>
+        <p>
+            <a class="btn btn-lg btn-info" href="/items/cart"
+               sec:authorize="hasAuthority('ROLE_USER')">장바구니</a>
+        </p>
+    </div>
+    <div th:replace="fragments/footer :: footer" />
+</div> <!-- /container -->
+</body>
+</html>

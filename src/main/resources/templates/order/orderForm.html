@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header" />
+<link rel="stylesheet" th:href="@{/css/orderForm.css?after}">
+<body>
+<div class="container">
+    <div th:replace="fragments/bodyHeader :: bodyHeader"/>
+    <div class="text-right">
+        <a class="btn btn-default" role="button"
+           th:href="@{/shopping/(sort='price,DESC')}" href="">가격순</a>
+    </div>
+    <div>
+        <form th:action="@{/items/search}" th:object="${itemSearch}" class="form-inline">
+            <div class="form-group mb-2">
+                <input type="text" th:field="*{name}" class="form-control"/>
+            </div>
+            <div class="form-group mx-sm-1 mb-2">
+            </div>
+            <button type="submit" class="btn btn-primary mb-2">검색</button>
+        </form>
+    </div>
+    <div class="thumbs__wrapper">
+        <div class="thumbs__item" th:each="item : ${items}">
+            <img class="thumbs__thumbnail" th:each="img : ${item.itemImgs}" th:src="${img.imgUrl}"/>
+            <div class="thumbs__info">
+                <span class="itemname" th:text="${item.name}"></span>
+                <span class="price" th:text="${#numbers.formatInteger(item.price, 0, 'COMMA')}+'원'"></span>
+            </div>
+            <form id="inCart" th:action="@{'/items/' + ${item.id} + '/cart'}" method="post">
+                <button class="btn btn-primary">담기</button>
+            </form>
+        </div>
+    </div>
+    <div class="page_wrap">
+        <div class="page_nation">
+            <a th:each="page: ${#numbers.sequence(1, items.totalPages)}" th:if="${items.totalPages>0}"
+               th:class="${page==items.number+1} ? active" href="#"
+
+               th:text="${page}" th:href="'javascript:paging('+${page}+')'"></a>
+            <p th:text="아이템이없습니다." th:unless="${items.totalPages>0}"></p>
+        </div>
+    </div>
+    <div th:replace="fragments/footer :: footer" />
+</div> <!-- /container -->
+</body>
+<script th:inline="javascript">
+const msg = [[${msg}]];
+const id  = [[${id}]];
+const condition = [[${param.name}]];
+const sortCondition = [[${param.sort}]];
+const sorted = [[${items.sort.sorted}]];
+function paging(page) {
+    if(sorted==true) {
+        window.location.href="/shopping/?page=" + page + "&sort=" + sortCondition;
+    } else if(sorted==false) {
+        window.location.href="/shopping/?page=" + page;
+    }
+    if(condition) {
+        window.location.href="/items/search?name=" + condition + "&page=" + page;
+    }
+
+}
+if(msg === '이미 장바구니에 있습니다. 이동하시겠습니까?') {
+    var result = confirm("이미 장바구니에 있습니다. 이동하시겠습니까?");
+    if(result) {
+     location.href="/items/cart";
+     }
+}
+</script>
+</html>
