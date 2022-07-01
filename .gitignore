@@ -36,3 +36,9 @@ out/
 ### VS Code ###
 .vscode/
 application.yml
+application-prod.yml
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
