@@ -53,23 +53,6 @@ class ItemServiceTest {
     }
 
     @Test
-    @DisplayName("구매할 아이템리스트")
-    public void findPurchaseItems() {
-        //given
-        Book book1 = createBook("JPA1 BOOK", 10000, 100);
-        Book book2 = createBook("JPA2 BOOK", 20000, 100);
-        em.persist(book1);
-        em.persist(book2);
-
-        //when
-        List<Long> longs = Arrays.asList(1L, 2L);
-        List<Item> itemList = itemService.findPurchaseItems(longs);
-
-        //then
-        assertThat(itemList.size()).isEqualTo(2);
-    }
-
-    @Test
     @DisplayName("아이템 삭제")
     public void delete() throws Exception {
         //given
