@@ -14,10 +14,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -76,8 +80,8 @@ class ItemServiceTest {
         //then
         assertThatThrownBy(()-> itemService.findOne(1L))
                 .isInstanceOf(NotExistItemException.class);
-
     }
+
     private Book createBook(String name, int price, int stockQuantity) {
         return Book.builder()
                 .name(name)

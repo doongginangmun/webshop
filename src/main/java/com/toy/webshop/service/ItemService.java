@@ -26,13 +26,13 @@ public class ItemService {
     private final ItemImgService itemImgService;
     private final ItemRepository itemRepository;
 
-
     /**
      * 상품 삭제
      * @param itemId
      */
     @Transactional
     public void delete(Long itemId) throws Exception {
+        itemImgService.deleteItemImg(itemId);
         itemRepository.deleteById(itemId);
     }
 
@@ -45,12 +45,13 @@ public class ItemService {
         //상품 수정
         Book findItem =(Book) itemRepository.findById(item.getId())
                 .orElseThrow(NotExistItemException::new);
-        findItem.updateBook(item);
-        
+
         //이미지 수정
         for(int i=0; i<multipartFileList.size(); i++) {
             itemImgService.updateItemImg(findItem, multipartFileList.get(i));
         }
+        findItem.updateBook(item);
+
         return findItem.getId();
     }
 

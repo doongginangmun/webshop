@@ -77,4 +77,13 @@ public class CartService {
 
         return cartDto;
     }
+
+    @Transactional
+    public Long createCart(User user) {
+       Cart cart = new Cart();
+       cart.setUser(user);
+        Cart savedCart = cartRepository.save(cart);
+
+        return savedCart.getId();
+    }
 }

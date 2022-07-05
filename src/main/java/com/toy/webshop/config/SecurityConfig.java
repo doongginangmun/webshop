@@ -67,6 +67,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests(request-> {
                     request.antMatchers("/","/users/new", "/duplicate").permitAll()
                             .antMatchers("/users").hasAuthority("ROLE_ADMIN")
+                            .antMatchers("/coupon/new").hasAuthority("ROLE_ADMIN")
+                            .antMatchers("/items/new", "/items", "/items/{itemId}/edit", "/items/{itemId}/delete").hasAuthority("ROLE_ADMIN")
                             .anyRequest().authenticated()
                             ;
                 })

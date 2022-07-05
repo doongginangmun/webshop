@@ -74,7 +74,7 @@ public class ItemController {
 
         return "items/updateItemForm";
     }
-    
+
     /**
      * 상품 수정
      */
@@ -93,6 +93,7 @@ public class ItemController {
      */
     @DeleteMapping("/items/{itemId}/delete")
     public String deleteItem(@PathVariable("itemId") Long itemId) throws Exception {
+        log.info("item delete 진입");
         itemService.delete(itemId);
         return "redirect:/items";
     }

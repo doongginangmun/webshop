@@ -33,7 +33,7 @@ public class UserCouponController {
             return "redirect:/coupons";
         }
         userCouponService.save(user, couponId);
-        return "coupon/myCoupon";
+        return "redirect:/";
     }
 
     /**

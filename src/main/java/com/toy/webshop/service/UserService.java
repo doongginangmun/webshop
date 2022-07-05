@@ -23,11 +23,12 @@ import java.util.stream.Collectors;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
-
+    private final CartService cartService;
     public Long save(User user) {
         validateDuplicateUser(user);
         User savedUser = userRepository.save(user);
         addAuthority(savedUser.getId(), "ROLE_USER");
+        cartService.createCart(savedUser);
         return savedUser.getId();
     }
 
