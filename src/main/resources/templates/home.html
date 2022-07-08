@@ -34,6 +34,8 @@
         <p>
             <a class="btn btn-lg btn-secondary" href="/coupon/new"
                 sec:authorize="hasAuthority('ROLE_ADMIN')">쿠폰등록</a>
+            <a class="btn btn-lg btn-secondary" href="/coupon"
+               sec:authorize="hasAuthority('ROLE_ADMIN')">쿠폰관리</a>
         </p>
         <p class="lead" sec:authorize="hasAuthority('ROLE_ADMIN')">상품 기능</p>
         <p>

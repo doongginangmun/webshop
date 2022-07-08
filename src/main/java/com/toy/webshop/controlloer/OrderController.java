@@ -105,4 +105,11 @@ public class OrderController {
         model.addAttribute("orders", orderDtos);
         return "order/orderList";
     }
+
+    @DeleteMapping("/orders/{orderId}/delete")
+    public String orderCancel(@PathVariable("orderId") Long id) {
+        log.info("id={}", id);
+        orderService.cancelOrder(id);
+        return "redirect:/orderList";
+    }
 }

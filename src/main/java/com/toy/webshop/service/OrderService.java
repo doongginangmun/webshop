@@ -107,6 +107,7 @@ public class OrderService {
         Order result = orderRepository.findById(orderId).orElseThrow(IllegalStateException::new);
         //주문 취소
         result.cancel();
+
     }
 
     @Transactional

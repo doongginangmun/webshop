@@ -3,6 +3,7 @@ package com.toy.webshop.form;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
@@ -22,4 +23,7 @@ public class UserForm {
     private String city;
     private String street;
     private String zipcode;
+
+    @AssertTrue(message = "아이디 중복체크를 해주세요!")
+    private Boolean isDuplicatedEmail = false;
 }

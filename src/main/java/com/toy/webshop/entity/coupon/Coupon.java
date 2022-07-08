@@ -51,4 +51,8 @@ public class Coupon implements DiscountPolicy {
             return Math.max(totalPrice - getDiscountPrice(), 0);
         }
     }
+
+    public void issuedCoupon() {
+        quantity = getQuantity()-1;
+    }
 }

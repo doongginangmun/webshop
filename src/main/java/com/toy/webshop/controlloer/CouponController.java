@@ -3,7 +3,9 @@ package com.toy.webshop.controlloer;
 import com.toy.webshop.dto.CouponDto;
 import com.toy.webshop.entity.coupon.Coupon;
 import com.toy.webshop.entity.item.Item;
+import com.toy.webshop.form.BookForm;
 import com.toy.webshop.form.CouponForm;
+import com.toy.webshop.form.CouponUpdateForm;
 import com.toy.webshop.service.CouponService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +50,34 @@ public class CouponController {
     }
 
     /**
-     * 쿠폰 목록
+     * 상품 수정 폼 전송
+     */
+    @GetMapping("/coupon/{couponId}/edit")
+    public String updateItemForm(@PathVariable("couponId") Long couponId, Model model) {
+        Coupon findCoupon = couponService.findOne(couponId);
+
+        CouponUpdateForm form = CouponUpdateForm.builder()
+                .id(findCoupon.getId())
+                .name(findCoupon.getName())
+                .discountPrice(findCoupon.getDiscountPrice())
+                .quantity(findCoupon.getQuantity())
+                .couponType(findCoupon.getCouponType())
+                .build();
+
+        model.addAttribute("form", form);
+
+        return "coupon/updateCouponForm";
+    }
+    /**
+     * 쿠폰 수정
+     */
+    @PostMapping("/coupon/{couponId}/edit")
+    public String updateCoupon(@ModelAttribute("form") CouponUpdateForm form) {
+        couponService.updateCoupon(form);
+        return "redirect:/coupons";
+    }
+    /**
+     * 발급 받을 쿠폰 목록
      */
     @GetMapping("/coupons")
     public String list(Pageable pageable, Model model) {
@@ -57,4 +86,22 @@ public class CouponController {
         return "coupon/issuedCoupon";
     }
 
+    /**
+     * 전체 쿠폰 목록
+     */
+    @GetMapping("/coupon")
+    public String couponList(Pageable pageable, Model model) {
+        Page<CouponDto> coupons = couponService.findCoupons(pageable);
+        model.addAttribute("coupons", coupons);
+        return "coupon/couponList";
+    }
+
+    /**
+     * 쿠폰 삭제
+     */
+    @DeleteMapping("/coupon/{couponId}/delete")
+    public String deleteCoupon(@PathVariable("couponId") Long couponId) throws Exception {
+        couponService.deleteCoupon(couponId);
+        return "redirect:/coupon";
+    }
 }

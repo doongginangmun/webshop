@@ -35,6 +35,8 @@ public class UserCouponService {
 
         UserCoupon userCoupon = UserCoupon.createUserCoupon(findUser, findCoupon, 1);
 
+        findCoupon.issuedCoupon(); //coupon quantity - 1
+
         UserCoupon savedUserCoupon = userCouponRepository.save(userCoupon);
         return savedUserCoupon.getId();
     }

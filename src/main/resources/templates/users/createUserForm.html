@@ -22,6 +22,7 @@
                 <a class="btn btn-outline-primary" id="button-addon2" onclick="dataSend()">중복체크</a>
             </div>
             <p th:errors="*{email}">Incorrect date</p>
+            <p th:errors="*{isDuplicatedEmail}">Incorrect date</p>
         </div>
         <div class="form-group">
             <label th:for="password">비밀번호</label>
@@ -52,6 +53,7 @@
             <input type="text" th:field="*{zipcode}" class="form-control"
                    placeholder="우편번호를 입력하세요">
         </div>
+        <input type="hidden" th:field="*{isDuplicatedEmail}" class="form-control">
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
     <br/>
@@ -68,6 +70,9 @@ function dataSend() {
 			success: function(data){
             if(data.validEmail==true && data.duplicateEmail==false) {
                 alert("사용 가능한 이메일 입니다.");
+                $("#isDuplicatedEmail").val("true");
+                var tag = document.querySelector("p");
+                tag.parentNode.removeChild(tag);
 			}else if(data.validEmail==false) {
 			    alert("이메일 형식이 맞지 않습니다.");
 			}else if(data.validEmail==true && data.duplicateEmail==true) {
