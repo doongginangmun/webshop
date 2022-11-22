@@ -1,18 +1,18 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/header :: header" />
-<link rel="stylesheet" th:href="@{/css/couponIssued.css?after}">
+<!--<head th:replace="fragments/header :: header" />-->
+<!--<link rel="stylesheet" th:href="@{/css/couponIssued.css?after}">-->
+<head th:replace="fragments/header :: header(~{::link})">
+<link rel="stylesheet" th:href="@{/css/couponIssued.css}">
+
 <body>
 <div class="container">
-    <div th:replace="fragments/bodyHeader :: bodyHeader"/>
 
     <p>쿠폰함</p>
     <div class="coupons__wrapper">
         <div th:each="coupon : ${myCoupons}">
             <img th:src="@{/img/defaultCoupon.png}"/>
             <p th:text="${coupon.coupon.name}"></p>
-
-            </form>
         </div>
     </div>
 

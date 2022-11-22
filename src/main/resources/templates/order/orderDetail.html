@@ -1,0 +1,67 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header(~{::link})">
+<link rel="stylesheet" th:href="@{/css/orderDetail.css?after}">
+<body>
+<div class="container">
+    <table class="table text-center text-wrap">
+        <thead>
+        <tr>
+            <th>주문번호</th>
+            <th>상품 이름</th>
+            <th>상품 금액</th>
+            <th>상품 수량</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="orderItem : ${order.orderItems}">
+            <td th:text="${order.id}"></td>
+            <td th:text="${orderItem.itemName}"></td>
+            <td th:text="${#numbers.formatInteger(orderItem.orderPrice, 3, 'COMMA') + '원'}"></td>
+            <td th:text="${orderItem.count}"></td>
+            <td>
+                <form th:if="${order.orderStatus.name() == 'ORDER'}" href="#"
+
+                      th:action="@{'/item/detail/'+ ${orderItem.itemId}}">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button class="btn btn-danger ">리뷰 남기기</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+        <div class="heading heading2 mgt6">
+            <h4>주문/결제 금액 정보</h4>
+        </div>
+    <div class="accordion" id="accordionExample">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    상품 주문 금액
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne">
+
+                <div class="accordion-body" th:text="${#numbers.formatInteger(order.orderPrice, 3, 'COMMA') + '원'}">
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    쿠폰 할인 금액
+                </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo">
+                <div class="accordion-body" th:text="${#aggregates.sum(order.orderItems.![orderPrice * count])} - ${order.orderPrice} + 원">
+              </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="fragments/footer :: footer"/>
+</div> <!-- /container -->
+</body>
+<script th:inline="javascript">
+</script>
+</html>

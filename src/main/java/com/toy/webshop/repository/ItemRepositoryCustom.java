@@ -14,4 +14,5 @@ public interface ItemRepositoryCustom {
     Page<ItemDto> dynamicSearchItems(ItemSearchCondition condition, Pageable pageable);
     Page<Item> items(Pageable pageable);
     JPAQuery<Long> itemCount();
+    Page<Item> findAll(Pageable pageable);
 }

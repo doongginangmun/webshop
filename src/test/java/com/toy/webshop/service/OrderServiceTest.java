@@ -1,14 +1,16 @@
 package com.toy.webshop.service;
 
+import com.toy.webshop.dto.ItemDto;
 import com.toy.webshop.entity.*;
 import com.toy.webshop.entity.coupon.Coupon;
 import com.toy.webshop.entity.coupon.CouponType;
 import com.toy.webshop.entity.item.Book;
 import com.toy.webshop.entity.item.Item;
 import com.toy.webshop.repository.CouponRepository;
+import com.toy.webshop.repository.ItemRepository;
 import com.toy.webshop.repository.OrderRepository;
+import com.toy.webshop.repository.UserRepository;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,66 +18,52 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.util.Arrays;
+
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 
-
-@SpringBootTest
 @Transactional
+@SpringBootTest
 class OrderServiceTest {
 
     @Autowired
     OrderService orderService;
     @Autowired
-    UserCouponService userCouponService;
-    @Autowired
     OrderRepository orderRepository;
-    @Autowired
-    CouponRepository couponRepository;
     @Autowired
     CartService cartService;
     @Autowired
+    CouponRepository couponRepository;
+    @Autowired
+    UserCouponService userCouponService;
+    @Autowired
     EntityManager em;
 
+
     @Test
-    @DisplayName("한개주문테스트")
-    public void order() {
-        //given
-        User user = getUser();
-        Item item = createBook("시골 JPA", 10000, 10);
-        int orderCount = 2;
-
-        //When
-        putInCart(user, item);
-        Long orderId = orderService.order(user, orderCount, List.of(item.getId()));
-        Order findOrder = orderRepository.findById(orderId).get();
-
-        //Then
-        assertThat(findOrder.getUser()).isEqualTo(user);
-        assertThat(findOrder.getStatus()).isEqualTo(OrderStatus.ORDER);
-        assertThat(findOrder.getOrderItems().size()).isEqualTo(1);
-
-    }
-    @Test
-    @DisplayName("여러주문테스트")
+    @DisplayName("상품 주문")
     public void order2() {
         //given
         User user = getUser();
         Item item1 = createBook("시골 JPA", 10000, 10);
         Item item2 = createBook("김두한 JPA", 20000, 20);
-        int orderCount = 2;
-
-        //When
         putInCart(user, item1, item2);
-        orderService.order(user, orderCount, Arrays.asList(item1.getId(), item2.getId()));
-        List<Order> findOrders = orderRepository.findByUserId(user.getId());
+        List<ItemDto> itemDtos = List.of(item1, item2)
+                .stream()
+                .map(ItemDto::new).collect(Collectors.toList());
+
+        List<Long> itemIds = itemDtos.stream()
+                .map(ItemDto::getId).collect(Collectors.toList());
+        //When
+        Long order = orderService.order(user, itemDtos, itemIds);
 
         //Then
-        assertThat(findOrders.get(0).getOrderItems().get(0).getItem().getName()).isEqualTo("시골 JPA");
-        assertThat(findOrders.get(0).getOrderItems().get(1).getItem().getName()).isEqualTo("김두한 JPA");
-
+        Optional<Order> findOrder = orderRepository.findById(order);
+        assertThat(findOrder.get().getOrderItems()).extracting("item").extracting("name").containsExactly("시골 JPA", "김두한 JPA");
+        assertThat(findOrder.get().getOrderPrice()).isEqualTo(30000);
     }
 
     @Test
@@ -85,28 +73,26 @@ class OrderServiceTest {
         User user = getUser();
         Item item1 = createBook("시골 JPA", 10000, 10);
         Item item2 = createBook("김두한 JPA", 20000, 20);
-        int orderCount = 1;
+        putInCart(user, item1, item2);
+        List<ItemDto> itemDtos = List.of(item1, item2)
+                .stream()
+                .map(ItemDto::new).collect(Collectors.toList());
 
-        Delivery delivery = new Delivery();
-        delivery.setAddress(user.getAddress());
-
-        Coupon coupon = Coupon.createCoupon("20000원할인쿠폰", 20000, 1,CouponType.FIXED);
+        List<Long> itemIds = itemDtos.stream()
+                .map(ItemDto::getId).collect(Collectors.toList());
+        Coupon coupon = Coupon.createCoupon("20000원할인쿠폰", 20000, 1, CouponType.FIXED);
 
         Coupon savedCoupon = couponRepository.save(coupon);
         userCouponService.save(user, savedCoupon.getId());
-
-        //when
         putInCart(user, item1, item2);
-        orderService.orderCoupon(user, orderCount, savedCoupon.getId(),
-                Arrays.asList(item1.getId(), item2.getId()));
-
-        List<Order> findOrder = orderRepository.findAll();
+        //when
+        Long savedOrder = orderService.orderCoupon(user, itemDtos, itemIds, savedCoupon.getId());
+        Order findOrder = orderRepository.findById(savedOrder).get();
 
         //then
-        assertThat(findOrder.size()).isEqualTo(1);
-        assertThat(findOrder.get(0).getOrderPrice()).isEqualTo(10000);
+        assertThat(findOrder.getOrderPrice()).isEqualTo(10000);
+        assertThat(findOrder.getCoupon().getCoupon().getName()).isEqualTo("20000원할인쿠폰");
     }
-
     private User getUser() {
         User user = User.builder()
                 .email("kdjkmit@naver.com")
@@ -127,9 +113,9 @@ class OrderServiceTest {
         em.persist(book);
         return book;
     }
-
     private void putInCart(User user, Item... items) {
         for(Item item : items)
-            cartService.putInCart(item.getId(), user);
+            cartService.putInCart(item.getId(),1, user);
     }
+
 }

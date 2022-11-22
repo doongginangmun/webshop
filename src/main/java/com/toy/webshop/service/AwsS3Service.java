@@ -17,6 +17,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -61,7 +63,9 @@ public class AwsS3Service {
     }
 
     private String createFileName(String fileName) {
-        return UUID.randomUUID().toString().concat(getFileExtension(fileName));
+        LocalDateTime now = LocalDateTime.now();
+        String formatedNow = now.format(DateTimeFormatter.ofPattern("yyyyMMdd/")); // 20221104/
+        return formatedNow.concat(UUID.randomUUID().toString().concat(getFileExtension(fileName)));
     }
 
     private String getFileExtension(String fileName) {

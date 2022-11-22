@@ -2,8 +2,6 @@ package com.toy.webshop.controlloer;
 
 import com.toy.webshop.dto.CouponDto;
 import com.toy.webshop.entity.coupon.Coupon;
-import com.toy.webshop.entity.item.Item;
-import com.toy.webshop.form.BookForm;
 import com.toy.webshop.form.CouponForm;
 import com.toy.webshop.form.CouponUpdateForm;
 import com.toy.webshop.service.CouponService;
@@ -11,8 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -74,7 +70,7 @@ public class CouponController {
     @PostMapping("/coupon/{couponId}/edit")
     public String updateCoupon(@ModelAttribute("form") CouponUpdateForm form) {
         couponService.updateCoupon(form);
-        return "redirect:/coupons";
+        return "redirect:/coupon";
     }
     /**
      * 발급 받을 쿠폰 목록
@@ -87,7 +83,7 @@ public class CouponController {
     }
 
     /**
-     * 전체 쿠폰 목록
+     * 전체 쿠폰 목록 - 관리
      */
     @GetMapping("/coupon")
     public String couponList(Pageable pageable, Model model) {

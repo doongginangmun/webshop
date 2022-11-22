@@ -1,10 +1,9 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/header :: header" />
-<link rel="stylesheet" th:href="@{/css/couponIssued.css?after}">
+<head th:replace="fragments/header :: header(~{::link})">
+<link rel="stylesheet" th:href="@{/css/couponIssued.css}">
 <body>
 <div class="container">
-    <div th:replace="fragments/bodyHeader :: bodyHeader"/>
     <p th:text="|현재 발급할 수 있는 쿠폰이 없습니다.|" th:if="${coupons.totalPages==0}"></p>
     <div th:unless="${coupons.totalPages==0}">
         <div class="coupons__wrapper">

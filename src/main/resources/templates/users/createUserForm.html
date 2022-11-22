@@ -1,7 +1,9 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/header :: header" />
+<!--<head th:replace="fragments/header :: header" />-->
 <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+<head th:replace="fragments/header :: header(~{::link})">
+<link rel="stylesheet" th:href="@{/css/carousel.css}">
 <style>
  .field-error {
  border-color: #bd2130;

@@ -39,8 +39,8 @@ class CartServiceTest {
         em.persist(book2);
 
         //when
-        cartService.putInCart(book1.getId(), user);
-        Long cartId = cartService.putInCart(book2.getId(), user);
+        cartService.putInCart(book1.getId(), 3, user);
+        Long cartId = cartService.putInCart(book2.getId(), 4, user);
 
         //then
         CartDto cartDto = cartService.myCartList(user.getId());
@@ -60,8 +60,8 @@ class CartServiceTest {
         em.persist(book2);
 
         //when
-        cartService.putInCart(book1.getId(), user);
-        cartService.putInCart(book2.getId(), user);
+        cartService.putInCart(book1.getId(),2, user);
+        cartService.putInCart(book2.getId(),2, user);
         List<Long> bookIds = new ArrayList<>();
         bookIds.add(book1.getId());
         bookIds.add(book2.getId());

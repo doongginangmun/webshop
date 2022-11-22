@@ -59,6 +59,10 @@ public class User implements UserDetails {
         this.address = address;
     }
 
+    public User(long userId) {
+        id = userId;
+    }
+
     @Override
     public String getUsername() {
         return email;

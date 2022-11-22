@@ -35,7 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(userLoginAuthenticationProvider)
-                .userDetailsService(userService).passwordEncoder(getPasswordEncoder());
+                .userDetailsService(userService);
 
     }
 
@@ -63,11 +63,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-//                .csrf().disable()
                 .authorizeRequests(request-> {
-                    request.antMatchers("/","/users/new", "/duplicate").permitAll()
+                    request.antMatchers("/","/users/new", "/duplicate","/img/**").permitAll()
                             .antMatchers("/users").hasAuthority("ROLE_ADMIN")
-                            .antMatchers("/coupon/new").hasAuthority("ROLE_ADMIN")
+                            .antMatchers("/admin","/coupon/new").hasAuthority("ROLE_ADMIN")
                             .antMatchers("/items/new", "/items", "/items/{itemId}/edit", "/items/{itemId}/delete").hasAuthority("ROLE_ADMIN")
                             .anyRequest().authenticated()
                             ;
@@ -79,13 +78,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                                  .defaultSuccessUrl("/", false)
                                  .failureUrl("/login-error")
                                  .authenticationDetailsSource(customDetails)
+                                 .successHandler(new MyLoginSuccessHandler())
                 )
+
                 .logout(logout-> logout.logoutSuccessUrl("/"))
                 .exceptionHandling(error ->
                         error.accessDeniedPage("/access-denied"))
                 .rememberMe(r-> r
-                        .rememberMeServices(rememberMeServices()))
-        ;
+                        .rememberMeServices(rememberMeServices()));
     }
 
     @Override
@@ -93,6 +93,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring()
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
                 .antMatchers("/favicon.ico", "/error");
-
     }
 }

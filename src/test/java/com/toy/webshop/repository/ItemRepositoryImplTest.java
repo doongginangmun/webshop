@@ -40,10 +40,10 @@ class ItemRepositoryImplTest {
     @BeforeEach
     public void before() {
         queryFactory = new JPAQueryFactory(em);
-        Book book1 = createBook("SPRINGBOOT1 BOOK", 40000, 100);
-        Book book2 = createBook("SPRINGBOOT2 BOOK", 30000, 100);
-        Book book3 = createBook("SPRINGBOOT3 BOOK", 20000, 100);
-        Book book4 = createBook("SPRINGBOOT4 BOOK", 10000, 50);
+        Book book1 = createBook("SPRINGBOOT1 BOOK", 10000, 100);
+        Book book2 = createBook("SPRINGBOOT2 BOOK", 20000, 100);
+        Book book3 = createBook("SPRINGBOOT3 BOOK", 30000, 100);
+        Book book4 = createBook("SPRINGBOOT4 BOOK", 40000, 50);
 
         ItemImg itemImg = ItemImg.builder().imgUrl("/images/item/2a739303-dcf6-4412-9c27-afb6bb5b785b.png")
                 .repImgUrl("Y")
@@ -58,36 +58,54 @@ class ItemRepositoryImplTest {
         em.persist(book4);
 
     }
+    @Test
+    @DisplayName("sort 확인")
+    public void findAll() {
+        Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.fromString("desc"), "price"));
+        Page<Item> all = itemRepository.findAll(pageable);
 
+        for (Item i: all) {
+            System.out.println(i);
+        }
+
+    }
     @Test
     @DisplayName("dsl 페이징")
     public void testcase() {
-        Pageable pageable = PageRequest.of(0, 1);
+        Pageable pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.fromString("desc"), "price"));
         Page<Item> items = itemRepository.items(pageable);
-
-        assertThat(items.getContent().size()).isEqualTo(1);
+        for (Item i: items) {
+            System.out.println(i);
+        }
+        assertThat(items.getContent().size()).isEqualTo(2);
 
     }
     @Test
     @DisplayName("dsl 정렬")
     public void sortBy() {
-        Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.fromString("asc"), "price"));
+        Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.fromString("desc"), "price"));
         Page<Item> items = itemRepository.items(pageable);
 
         assertThat(items.getContent().size()).isEqualTo(3);
+        for (Item i : items) {
+            System.out.println(i);
+        }
 
     }
     @Test
     @DisplayName("동적 검색 페이징")
     public void dynamicSearchItems() {
         //given
-        Pageable pageable = PageRequest.of(0, 2);
+        Pageable pageable = PageRequest.of(0, 2,Sort.by(Sort.Direction.fromString("desc"), "price"));
         ItemSearchCondition searchCondition = new ItemSearchCondition();
         searchCondition.setName("SPRINGBOOT");
         Page<ItemDto> itemDtos = itemRepository.dynamicSearchItems(searchCondition, pageable);
 
         assertThat(itemDtos.getTotalElements()).isEqualTo(4);
         assertThat(itemDtos.getTotalPages()).isEqualTo(2);
+        for (ItemDto i: itemDtos) {
+            System.out.println(i);
+        }
     }
 
     private Book createBook(String name, int price, int stockQuantity) {

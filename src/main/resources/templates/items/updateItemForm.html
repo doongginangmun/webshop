@@ -1,10 +1,13 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/header :: header" />
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/adminLayoutFile :: layout(~{::div}, ~{::link})}">
 <link rel="stylesheet" th:href="@{/css/updateItemForm.css}">
+<!--<head th:replace="fragments/header :: header" />-->
+<!--<head th:replace="fragments/header :: header(~{::link})">-->
+
 <body>
 <div class="container">
-  <div th:replace="fragments/bodyHeader :: bodyHeader"/>
+  <h2 class="title">상품 수정</h2>
   <form th:object="${form}" method="post" enctype="multipart/form-data">
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
     <!-- id -->
@@ -47,7 +50,6 @@
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
-  <div th:replace="fragments/footer :: footer" />
 </div> <!-- /container -->
 </body>
 </html>

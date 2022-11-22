@@ -25,10 +25,12 @@ public class CartItem {
     private int count;
     private int price;
 
-    public static CartItem createCartItem(Item item) {
+
+
+    public static CartItem createCartItem(Item item, int count) {
         CartItem cartItem = new CartItem();
         cartItem.setItem(item);
-        cartItem.setCount(1);
+        cartItem.setCount(count);
         cartItem.setPrice(item.getPrice());
         return cartItem;
     }

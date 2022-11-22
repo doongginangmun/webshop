@@ -32,8 +32,7 @@ public class ItemImgService {
 //    private String fileDir;
 //    private final FileService fileService;
 
-
-    public void saveItemImg(ItemImg itemImg, MultipartFile imgFile) throws Exception {
+    public void saveItemImg(ItemImg itemImg, MultipartFile imgFile) {
         String oriImgName = imgFile.getOriginalFilename();
         String imgName = "";
         String path = "";
@@ -61,18 +60,18 @@ public class ItemImgService {
 
     public void updateItemImg(Item findItem, MultipartFile imgFile) throws Exception {
         String oriImgName = imgFile.getOriginalFilename();
+        if(StringUtils.hasText(oriImgName)) {
+            //기존 이미지 삭제
+            deleteItemImg(findItem.getId());
+            //새로운 이미지파일 s3에 저장
+            String path = awsS3Service.uploadFile(imgFile);
+            String imgName = path.substring(path.lastIndexOf("/") + 1);
 
-        //기존 이미지 삭제
-        deleteItemImg(findItem.getId());
-
-        //새로운 이미지파일 s3에 저장
-        String path = awsS3Service.uploadFile(imgFile);
-        String imgName = path.substring(path.lastIndexOf("/")+1);
-
-        //db에 새로운 값 update
-        List<ItemImg> findImgs = findItem.getItemImgs();
-        for (int i=0; i<findImgs.size(); i++)
-            findImgs.get(i).updateItemImg(oriImgName,imgName, path);
+            //db에 새로운 값 update
+            List<ItemImg> findImgs = findItem.getItemImgs();
+            for (int i = 0; i < findImgs.size(); i++)
+                findImgs.get(i).updateItemImg(oriImgName, imgName, path);
+        }
     }
 
 //    public void deleteItemImg(Long itemId) throws Exception {

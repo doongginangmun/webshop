@@ -1,42 +1,100 @@
-<!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-        <link rel="stylesheet" th:href="@{/css/bootstrap.css}">
-        <link rel="stylesheet" th:href="@{/css/login.css}">
+    <head th:replace="fragments/header :: header(~{::link})">
+        <link rel="stylesheet" th:href="@{/css/signin.css}">
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+      .b-example-divider {
+        height: 3rem;
+        background-color: rgba(0, 0, 0, .1);
+        border: solid rgba(0, 0, 0, .15);
+        border-width: 1px 0;
+        box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+      }
+
+      .b-example-vr {
+        flex-shrink: 0;
+        width: 1.5rem;
+        height: 100vh;
+      }
+
+      .bi {
+        vertical-align: -.125em;
+        fill: currentColor;
+      }
+
+      .nav-scroller {
+        position: relative;
+        z-index: 2;
+        height: 2.75rem;
+        overflow-y: hidden;
+      }
+
+      .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+    </style>
+
+
 </head>
-<body>
-<!--container center-contents-->
-<div class="container">
-    <div th:replace="fragments/bodyHeader :: bodyHeader" />
-    <div class="row">
-        <form class="form-signin" method="post" th:action="@{/loginProcess}">
-            <h1 class="h3 mb-3 font-weight-normal"> 로그인 </h1>
-            <label for="username" class="sr-only">로그인 아이디</label>
+<body class="text-center">
+
+<main class="form-signin w-100 m-auto">
+    <form method="post" th:action="@{/loginProcess}">
+        <h1 class="h3 mb-3 fw-normal">로그인</h1>
+
+        <div class="form-floating">
             <input id="username"
                    name="username"
                    class="form-control"
-                   placeholder="아이디를 입력해 주세요."
+                   placeholder="name@example.com"
                    required autofocus>
-            <label for="password" class="sr-only">비밀번호</label>
+            <label for="username">아이디</label>
+        </div>
+        <div class="form-floating">
             <input type="password"
                    id="password"
                    name="password"
                    class="form-control"
-                   placeholder="비밀번호를 입력해 주세요"
-                   required>
-            <div class="checkbox mb-3">
-                <label>
-                    <input type="checkbox" name="remember-me"> 로그인 기억하기
-                </label>
-            </div>
-            <button class="btn btn-lg btn-primary btn-block"  type="submit"> 로그인 </button>
-            <div class="error-message" th:if="${loginError}">
-                <span> 아이디나 패스워드가 올바르지 않습니다. </span>
-            </div>
-        </form>
-    </div>
-    <div th:replace="fragments/footer :: footer" />
-</div>
-<script th:src="@{/js/bootstrap.js}" />
+                   placeholder="Password">
+            <label for="password">비밀번호</label>
+        </div>
+
+        <div class="checkbox mb-3">
+            <label>
+                <input type="checkbox" name="remember-me"> 로그인 기억하기
+            </label>
+        </div>
+        <button class="w-100 btn btn-lg btn-primary" type="submit">로그인</button>
+        <p class="mt-5 mb-3 text-muted">&copy; 2017–2022</p>
+    </form>
+</main>
 </body>
+<script type="text/javascript">
+    $(window).on('load',function(){
+        $('#myModal').modal('show');
+    });
+</script>
 </html>

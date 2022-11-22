@@ -1,10 +1,14 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/header :: header" />
-<link rel="stylesheet" th:href="@{/css/orderForm.css?after}">
+<!-- 템플릿 조각 -->
+<!--<head th:replace="fragments/header :: header" />-->
+<!--<link rel="stylesheet" th:href="@{/css/orderForm.css?after}">-->
+
+<!-- 템플릿 레이아웃 -->
+<head th:replace="fragments/header :: header(~{::link})">
+<link rel="stylesheet" th:href="@{/css/orderForm.css}">
 <body>
 <div class="container">
-    <div th:replace="fragments/bodyHeader :: bodyHeader"/>
     <div class="text-right">
         <a class="btn btn-default" role="button"
            th:href="@{/shopping/(sort='price,DESC')}" href="">가격순</a>
@@ -21,12 +25,15 @@
     </div>
     <div class="thumbs__wrapper">
         <div class="thumbs__item" th:each="item : ${items}">
+            <a th:href="@{/item/detail/{id} (id=${item.id})}">
             <img class="thumbs__thumbnail" th:each="img : ${item.itemImgs}" th:src="${img.imgUrl}"/>
+            </a>
             <div class="thumbs__info">
                 <span class="itemname" th:text="${item.name}"></span>
                 <span class="price" th:text="${#numbers.formatInteger(item.price, 0, 'COMMA')}+'원'"></span>
             </div>
-            <form id="inCart" th:action="@{'/items/' + ${item.id} + '/cart'}" method="post">
+            <form th:action="@{'/items/' + ${item.id} + '/cart'}" method="post">
+                <input type="hidden" name="count" value="1">
                 <button class="btn btn-primary">담기</button>
             </form>
         </div>
@@ -58,7 +65,6 @@ function paging(page) {
     if(condition) {
         window.location.href="/items/search?name=" + condition + "&page=" + page;
     }
-
 }
 if(msg === '이미 장바구니에 있습니다. 이동하시겠습니까?') {
     var result = confirm("이미 장바구니에 있습니다. 이동하시겠습니까?");
@@ -66,5 +72,6 @@ if(msg === '이미 장바구니에 있습니다. 이동하시겠습니까?') {
      location.href="/items/cart";
      }
 }
+
 </script>
 </html>

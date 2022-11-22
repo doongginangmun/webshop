@@ -1,29 +1,30 @@
 package com.toy.webshop.service;
 
 import com.toy.webshop.dto.ItemDto;
+import com.toy.webshop.dto.ItemImgDto;
 import com.toy.webshop.entity.ItemImg;
 import com.toy.webshop.entity.item.Book;
 import com.toy.webshop.entity.item.Item;
 import com.toy.webshop.exception.NotExistItemException;
 import com.toy.webshop.repository.ItemRepository;
-import org.assertj.core.api.Assertions;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
+
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,7 +38,10 @@ class ItemServiceTest {
     @Autowired
     private ItemService itemService;
     @Autowired
+    private ItemImgService itemImgService;
+    @Autowired
     private EntityManager em;
+
 
     @Test
     @DisplayName("아이템 페이징처리")

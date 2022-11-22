@@ -1,6 +1,6 @@
 package com.toy.webshop.entity;
 
-import com.toy.webshop.entity.coupon.Coupon;
+
 import com.toy.webshop.entity.coupon.UserCoupon;
 import com.toy.webshop.entity.discount.DiscountPolicy;
 import lombok.Getter;
@@ -21,9 +21,6 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @OneToOne(mappedBy = "order")
-    private UserCoupon userCoupon;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)   //연관 관계 주인
     @JoinColumn(name = "delivery_id")                              //매핑할 컬럼이름
@@ -88,7 +85,8 @@ public class Order {
         this.setStatus(OrderStatus.CANCEL);
         for(OrderItem orderItem : orderItems)
             orderItem.cancel();
-        coupon.cancel();
+        if(coupon!=null)
+            coupon.cancel();
     }
 
     //할인된 주문 가격 조회

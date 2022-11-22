@@ -11,6 +11,14 @@ public class CartItemDto {
     private int price;
     private int count;
 
+    public CartItemDto() {
+    }
+
+    public CartItemDto(Long id, int count) {
+        this.id = id;
+        this.count = count;
+    }
+
     public CartItemDto(Long id, String itemName, int price, int count) {
         this.id = id;
         this.itemName = itemName;

@@ -42,7 +42,7 @@ public class Coupon implements DiscountPolicy {
 
     @Override
     public int calculatePrice(Order order) {
-        IntStream intStream = order.getOrderItems().stream().mapToInt(OrderItem::getOrderPrice);
+        IntStream intStream = order.getOrderItems().stream().mapToInt(i ->i.getCount() * i.getOrderPrice());
         int totalPrice = intStream.sum();
 
         if(couponType==CouponType.PERCENT) {

@@ -1,0 +1,309 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<!--<head th:replace="fragments/header :: header" />-->
+<head th:replace="fragments/header :: header(~{::link})">
+<link rel="stylesheet" th:href="@{/css/itemDetail.css}">
+<body>
+<!--<div class="container">-->
+<!--    <div th:replace="fragments/bodyHeader :: bodyHeader"/>-->
+    <div class="detailsTopWrap">
+        <div class="detailsTopLeft">
+            <img class="thumbs__thumbnail" width="252" th:each="img : ${itemDetails.itemDto.itemImgs}" th:src="${img.imgUrl}"/>
+        </div>
+        <div class="detailsTopRight">
+            <div class="infoTop">
+                <p class="titleArea" th:text="${itemDetails.itemDto.name}"></p>
+                <span class="pubArea" th:text="${itemDetails.itemDto.author + ' 작가'}"></span>
+            </div>
+
+            <div class="infoBot">
+                <div class="infoTbArea">
+                    <table class="table table-borderless" summary="상품 가격 테이블">
+                        <colgroup>
+                            <col width="110">
+                            <col width="*">
+                        </colgroup>
+                        <tbody class="table-group-divider">
+                        <tr>
+                            <th scope="row">정가</th>
+                            <td>
+                                <span><em class="itemPrice" th:text="${#numbers.formatInteger(itemDetails.itemDto.price, 3, 'COMMA') + '원'}"></em></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">배송비</th>
+                            <td>
+                                <span><em>무료</em></span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div id="deliveryInfo" class="gd_infoTb bdr_top">
+                        <table id="deliInfoWrap" summary="배송안내">
+                            <colgroup>
+                                <col width="110">
+                                <col width="*">
+                            </colgroup>
+                            <tbody>
+                            <tr>
+                                <th scope="row">
+                                    배송안내
+                                </th>
+                                <td>
+                                    <p id="gdDeliAddr" class="gd_deliAddr"><span class="deli_addr">서울특별시 영등포구 덕담로11(세영빌딩)</span>
+                                    </p>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div class="gd_deliBoxGrp">
+                            <div id="deliBoxWrap" class="gd_deliBox" style="">
+                                <div id="dawnDeliveryDate" class="deliBox_row" style="display:none"></div>
+                                <div id="deliveryDate" class="deliBox_row"><span class="iconC ico_deliShot"><em class="txt">당일배송</em></span>  <a class="lnk_deli" href="javascript:void(0);" onclick="deliDatePopup(this)">오늘(11/12, 토)</a> 도착예정</div>
+                            </div>
+                            <ul id="deliFeeWrap" class="yesAlertLi">
+                                <!-- 배송비 문구 영역 시작 -->
+                                <!--// 배송정보 -->
+                                <li class="deli_des">
+                                    <em class="bgYUI bl_dot">&nbsp;</em>배송비 : 무료
+                                </li>
+                                <!-- 배송정보 //-->                    <!-- 배송비 문구 영역 끝 -->
+                            </ul>
+                        </div>
+                        <input type="hidden" name="hdnDelvGap" id="hdnDelvGap" value="0">
+                        <input type="hidden" id="hdnDelvText" value="오늘 도착예정">
+                    </div>
+                </div>
+                <div class="actions" style="min-height: 300px">
+                    <div class="gd_actionContGrp">
+                        <div class="gd_actionCont">
+                            <!-- 판매상태 영역 시작 -->
+                            <p class="gd_saleState">
+                                <em class="txC_black">판매중</em>
+                            </p>
+                            <!-- 판매상태 영역 끝 -->
+                            <!-- 수량 -->
+                            <dl class="gd_len">
+                                <dt>수량</dt>
+                                <dd>
+                                    <span class="yesIpt ipt_wSizeF">
+                                        <input name="ORD_GOODS_CNT" type="text" class="ac yes_m" th:value="1" onkeyup="checkGoodsCount()" maxlength="4">
+                                    </span>
+                                    <button type="button" class="bgGD minus" th:onclick="downCount();">
+                                        <span class="text">수량감소</span>
+                                    </button>
+                                    <button type="button" class="bgGD plus" th:onclick="upCount();" id="bgGD plus">
+                                    </button>
+                                </dd>
+                            </dl>
+                            <!-- 수량 끝-->
+                            <!-- 결제 버튼 01 영역 시작 -->
+                            <div id="divGdBtn" class="gd_btn">
+                                <!--카트에 넣기, 바로구매 시작-->
+                                <a href="javascript:void(0);" th:onclick="'javascript:addCart('+${itemDetails.itemDto.id}+')'" id="addToCartForDetail" class="btnC m_size btn_blue"><span class="bWrap"><em class="txt">카트에 넣기</em></span></a>
+                                <a href="javascript:void(0);" onclick="addOrder(0,'001001001012008 ',true,'nomemberOrderInfo',this,'Pcode','006_015','cart');" class="btnC m_size btn_sBlue"><span class="bWrap"><em class="txt">바로구매</em></span></a>
+                                <!--카트에 넣기, 바로구매 종료-->
+                            </div>
+                        </div>
+                        </div><!-- 결제 버튼 02 영역 끝 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<div id="yDetailBnWrap" class="clearfix">
+    <div class="comment">
+        <h3>댓글 <em class="comment_total" th:text="${itemDetails.reviews.totalElements}">0</em></h3>
+        <div class="comment_form" role="form">
+            <form action="/review/new" method="post" id="form" name="form">
+                <input type="hidden" name=itemId th:value="${itemDetails.itemDto.id}">
+                <select name="score" class="form-select" id="inputGroupSelect01">
+                    <option th:value="0" selected>--별점--</option>
+                    <option th:value="1">⭐</option>
+                    <option th:value="2">⭐⭐</option>
+                    <option th:value="3">⭐⭐⭐</option>
+                    <option th:value="4">⭐⭐⭐⭐</option>
+                    <option th:value="5">⭐⭐⭐⭐⭐</option>
+                </select>
+                <fieldset>
+                    <textarea class="textarea textarea--comment"name="content" id="txt_comment" maxlength="200" placeholder="저작권 등 다른 사람의 권리를 침해하거나 명예를 훼손하는 게시물은 이용약관 및 관련 법률에 의해 제재를 받을 수 있습니다.
+타인에게 불쾌감을 주는 욕설 또는 특정 계층/민족, 종교 등을 비하하는 단어들은 표시가 제한됩니다."></textarea>
+                <span class="comment__count" role="region" aria-live="polite" aria-label="글자수 제한"><em class="textCount">0</em> / 200</span>
+                <button type="submit" class="button--comment btn btn-primary">등록</button>
+                </fieldset>
+            </form>
+        </div>
+        <div id="comment">
+        <div th:each="review : ${itemDetails.reviews}" class="comment__list" id="review contentList">
+            <div class="accordion" id="accordionExample">
+                <div class="accordion-item" style="border-top: 0; border-bottom: 0;">
+                    <h2 class="accordion-header" th:id="${'review_' + 'heading_' + reviewStat.count}">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" th:data-bs-target="${'#'+ 'review' + reviewStat.count}" aria-expanded="true" th:aria-controls="${'review' + reviewStat.count}">
+                            <span class="review_rating" th:text="${review.score}">별점</span>
+                            <em th:text="${review.user.name}">작성자</em>
+                            <span class="review_createAt" th:text="${'(' + #temporals.format(review.createAt, 'yyyy-MM-dd HH:mm') + ')'}">작성일</span>
+
+                        </button>
+                    </h2>
+                    <div th:id="${'review' + reviewStat.count}" class="accordion-collapse collapse show" th:aria-labelledby="${'review' + reviewStat.index}">
+                        <div class="accordion-body" style="display: flex; justify-content: space-between;">
+                            <div style="word-break:break-all; width: 90%;" th:text="${review.content}"></div>
+                            <div>
+                                <a class="item_review_delete"  th:if="${#authentication.getPrincipal().getName()== review.user.name}"
+                                   href="javascript:void(0);" th:onclick="'javascript:removeReview('+${review.id}+')'">삭제</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <div class="page_wrap">
+                <div class="page_nation">
+                    <ul class="pagination">
+                    <li class="page-item"><a th:each="page: ${#numbers.sequence(1, itemDetails.reviews.totalPages)}" th:if="${itemDetails.reviews.totalPages>0}"
+                       th:class="page-link" th:classappend="${page==itemDetails.reviews.number+1} ? active" href="#"
+                       th:text="${page}" th:href="'javascript:paging('+${page}+')'"></a>
+                    </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <div th:replace="fragments/footer :: footer"/>
+</body>
+<script th:inline="javascript">
+var header = /*[[${_csrf.headerName}]]*/;
+var token = /*[[${_csrf.token}]]*/;
+function removeReview(id) {
+const itemId = $("input[name=itemId]").val();
+    var url = "/review/delete/" + id;
+     $.ajax({
+			type: 'delete',
+			url: url,
+			data:
+			{'itemId' : itemId},
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+            },
+			success: function(fragment){
+                var html = $(fragment);
+                var arrDiv = html.find(".comment_total");
+                $('#txt_comment').val('');
+                $("#inputGroupSelect01").val(0).prop("selected", true);
+                $(".comment_total").replaceWith(arrDiv);
+                var comment = html.find("#comment");
+                $("#comment").replaceWith(comment);
+            }
+        });
+}
+function paging(page) {
+const itemId = $("input[name=itemId]").val();
+var url = "/item/detail/"+ itemId + "?page="+ page;
+         $.ajax({
+			type: 'Get',
+			url: url,
+			beforeSend : function(xhr) {
+				xhr.setRequestHeader(header, token);
+            },
+			success: function(fragment){
+                var html = $(fragment);
+                var arrDiv = html.find("div");
+                $("#comment").replaceWith(arrDiv.find("#comment"));
+            }
+        });
+}
+form.addEventListener("submit", e => {
+e.preventDefault();
+const itemId = $("input[name=itemId]").val();
+const score = $("select[name=score]").val();
+const content = $("textarea[id=txt_comment]").val();
+
+        $.ajax({
+			type: 'POST',
+			url:'/review/new',
+			data: JSON.stringify
+			({'itemId' : itemId,
+			    'score' : score,
+			    'content': content,
+			}),
+			contentType: 'application/json',
+			beforeSend : function(xhr)
+            {
+				xhr.setRequestHeader(header, token);
+            }
+           ,
+			success: function(fragment){
+                var html = $(fragment);
+                var arrDiv = html.find(".comment_total");
+                $('#txt_comment').val('');
+                $("#inputGroupSelect01").val(0).prop("selected", true);
+                $(".comment_total").replaceWith(arrDiv);
+                var comment = html.find("#comment");
+                $("#comment").replaceWith(comment);
+            }
+        });
+});
+
+$('#txt_comment').keyup(function (e) {
+	let content = $(this).val();
+    $('.textCount').text(content.length);
+    // 글자수 제한
+    if (content.length > 200) {
+    	// 200자 부터는 타이핑 되지 않도록
+        $(this).val($(this).val().substring(0, 200));
+        $('.textCount').text(200);
+        alert('글자수는 200자까지 입력 가능합니다.');
+    }
+});
+
+    function checkGoodsCount() {
+      const resultElement = document.querySelector("input[name='ORD_GOODS_CNT']");
+      if(event.keyCode<48 || event.keyCode>57){
+            alert("숫자만 입력가능 합니다");
+            resultElement.value = "1";
+      }
+    }
+    function upCount() {
+      const resultElement = document.querySelector("input[name='ORD_GOODS_CNT']");
+       let number = resultElement.value;
+       number = parseInt(number) + 1;
+       resultElement.value = number;
+    }
+    function downCount() {
+      const resultElement = document.querySelector("input[name='ORD_GOODS_CNT']");
+
+      // 현재 화면에 표시된 값
+      let number = resultElement.value;
+      number = parseInt(number) - 1;
+      if(number < 1) {
+            alert("수량은 1개 이상이어야 합니다.");
+            resultElement.value = "1";
+      }else {
+        resultElement.value = number;
+      }
+    }
+    function addCart(id) {
+     const resultElement = document.querySelector("input[name='ORD_GOODS_CNT']");
+     var form = document.createElement("form");
+     form.setAttribute("method", "post");
+     form.setAttribute("action", "/items/" + id + "/cart");
+
+     var countField = document.createElement("input");
+     countField.setAttribute("type", "text");
+     countField.setAttribute("name", "count");
+     countField.setAttribute("value", resultElement.value);
+     form.appendChild(countField);
+
+     var hiddenField = document.createElement("input");
+     hiddenField.setAttribute("type", "hidden");
+     hiddenField.setAttribute("name", "_csrf");
+     hiddenField.setAttribute("value", token);
+     form.appendChild(hiddenField);
+
+
+     document.body.appendChild(form);
+     form.submit();
+    }
+</script>
+</html>

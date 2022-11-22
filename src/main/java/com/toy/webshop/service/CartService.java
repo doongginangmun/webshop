@@ -37,20 +37,19 @@ public class CartService {
    }
 
    @Transactional
-   public Long putInCart(Long itemId, User user) {
+   public Long putInCart(Long itemId, int count,  User user) {
        Cart findCart = getCart(user.getId());
 
        Item findItem = itemRepository.findById(itemId)
                .orElseThrow(NotExistItemException::new);
 
-       CartItem cartItem = CartItem.createCartItem(findItem);
+       CartItem cartItem = CartItem.createCartItem(findItem, count);
 
        if(findCart!=null) {
           return updateCartItem(cartItem, findCart);
        }
         Cart cart = Cart.createCart(user, cartItem);
         cartRepository.save(cart);
-
        return cart.getId();
     }
 
@@ -72,6 +71,7 @@ public class CartService {
     @Transactional
     public CartDto myCartList(Long userId) {
         CartDto cartDto = cartRepository.findCart(userId);
+        if(cartDto == null) return new CartDto(0L, "");
         List<CartItemDto> cartItems = cartRepository.findCartItems(cartDto.getId());
         cartDto.setCartItems(cartItems);
 
@@ -85,5 +85,19 @@ public class CartService {
         Cart savedCart = cartRepository.save(cart);
 
         return savedCart.getId();
+    }
+
+    @Transactional
+    public Long countCartItems(User user) {
+        Cart findCart = cartRepository.findByUserId(user.getId());
+        if(findCart==null) return 0L;
+        else
+            return cartRepository.countCartItems(findCart.getId());
+    }
+
+    @Transactional
+    public List<CartItem> findOrderItems(List<Long> itemIds, User user) {
+        Cart cart = getCart(user.getId());
+        return cartRepository.findOrderCartItems(itemIds, cart.getId());
     }
 }

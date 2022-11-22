@@ -10,10 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Arrays;
@@ -33,16 +30,17 @@ public class CartController {
      */
     @PostMapping("/items/{id}/cart")
     public String putInCart(@PathVariable("id")Long itemId,
+                            String count,
                             @Login User user,
                             RedirectAttributes redirectAttributes) {
-
+        log.info("count = {}", count);
         boolean existItem = cartService.existItem(user.getId(), itemId);
         if(existItem) {
             redirectAttributes.addFlashAttribute("id", user.getId());
             redirectAttributes.addFlashAttribute("msg", "이미 장바구니에 있습니다. 이동하시겠습니까?");
             return "redirect:/shopping";
         }
-        cartService.putInCart(itemId, user);
+        cartService.putInCart(itemId,Integer.parseInt(count), user);
         return "redirect:/";
     }
 
@@ -65,6 +63,16 @@ public class CartController {
         CartDto carts = cartService.myCartList(user.getId());
         model.addAttribute("carts", carts);
         return "cart/cartList";
+    }
+    /**
+     * 장바구니 아이템 개수 카운트
+     */
+    @GetMapping("/items/count")
+    @ResponseBody
+    public Long cartCount(@Login User user) {
+        Long aLong = cartService.countCartItems(user);
+        log.info("countCart ={}", aLong);
+        return aLong;
     }
 
 }

@@ -1,14 +1,117 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:fragment="header">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <!-- 템플릿 레이아웃 -->
+    <head th:fragment="header(links)">
+    <!-- 공통 -->
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="/css/bootstrap.min.css" integrity="sha384-
-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
           crossorigin="anonymous">
-    <!-- Custom styles for this template -->
-    <link href="/css/jumbotron-narrow.css" rel="stylesheet">
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <!--  Jquery -->
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', function(){
+            $.ajax({
+                    type: 'GET',
+                    url:'/items/count',
+                    success: function(data){
+                        $("#cartCount").text(data);
+                    }
+                });
+        });
+    </script>
+    <!-- 추가 -->
+    <th:block th:replace="${links}" />
+
     <title>WEB SHOP!</title>
+    <header>
+        <style>
+        body {
+padding-top: 3rem;
+padding-bottom: 3rem;
+color: #5a5a5a;
+}
+    .rounded-circle svg {
+      background: white;
+      border-radius: 50%;
+    }
+    svg:hover {
+        color: black;
+    }
+        </style>
+        <!-- Fixed navbar -->
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top navbar-primary bg-primary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">Web Shop</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="/">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/shopping">Product</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/coupons">Coupons</a>
+                        </li>
+                    </ul>
+                    <div class="d-flex">
+                        <a class="btn btn-md btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                           sec:authorize="isAnonymous()">로그인</a>
+                        <div sec:authorize="isAuthenticated()">
+                            <div class="collapse navbar-collapse" id="navbarNavDarkDropdown">
+                                <ul class="navbar-nav">
+                                    <a href="/" th:class="rounded-circle">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-bell" viewBox="-4 -4 25 25">
+                                            <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+                                            <span class="top-0 start-100 translate-middle badge rounded-pill bg-danger">3</span>
+                                        </svg>
+                                    </a>
+                                    <a href="/items/cart" th:class="rounded-circle">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-cart2" viewBox="-4 -4 25 25">
+                                            <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5zM3.14 5l1.25 5h8.22l1.25-5H3.14zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>
+                                            <span class="top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount"></span>
+                                        </svg>
+                                    </a>
+                                    <li class="nav-item dropdown">
+                                        <a th:text="|${#authentication.getPrincipal().getName()}님 환영합니다.|" class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            유저이름
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-primary" aria-labelledby="navbarDarkDropdownMenuLink">
+                                            <li><a class="dropdown-item" href="/usercoupons" sec:authorize="hasAuthority('ROLE_USER')">쿠폰함</a></li>
+                                            <li><a class="dropdown-item" href="/orderList"   sec:authorize="hasAuthority('ROLE_USER')">주문 내역</a></li>
+                                            <li><form th:action="@{/logout}" method="post"   sec:authorize="isAuthenticated()"><button class="dropdown-item" type="submit">로그 아웃</button></form></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">로그인</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <th:block th:replace="~{/fragments/login :: setLogin(~{this::login} )}"></th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
 </head>
+

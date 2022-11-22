@@ -1,7 +1,6 @@
 package com.toy.webshop.service;
 
-import com.toy.webshop.dto.OrderDto;
-import com.toy.webshop.dto.OrderItemDto;
+import com.toy.webshop.dto.*;
 import com.toy.webshop.entity.*;
 import com.toy.webshop.entity.coupon.Coupon;
 import com.toy.webshop.entity.coupon.UserCoupon;
@@ -32,13 +31,14 @@ public class OrderService {
     private final CouponRepository couponRepository;
     private final UserCouponService userCouponService;
 
+
     /**
      * 주문 - 쿠폰 할인
      */
     @Transactional
-    public Long orderCoupon(User user, int count, Long couponId, List<Long> itemId) {
-
+    public Long orderCoupon(User user, List<ItemDto> itemDtos, List<Long> itemIds, Long couponId) {
         List<UserCoupon> myCoupon = userCouponService.findMyCoupon(user);
+
         UserCoupon userCoupon = myCoupon.stream().filter(m -> m.getCoupon().getId().equals(couponId))
                 .findAny().orElseThrow(NotExistItemException::new);
 
@@ -48,13 +48,13 @@ public class OrderService {
         User findUser = userRepository.findById(user.getId())
                 .orElseThrow(NotFoundUserException::new);
 
-        List<Item> collect = itemId.stream().map(id ->
-                    itemRepository.findById(id).orElseThrow(NotExistItemException::new))
-                    .collect(Collectors.toList());
+        List<Item> collect = itemIds.stream().map(id ->
+                        itemRepository.findById(id).orElseThrow(NotExistItemException::new))
+                .collect(Collectors.toList());
 
         OrderItem[] orderItems = collect.stream().map(i ->
-                    OrderItem.createOrderItem(i, i.getPrice(), count))
-                    .toArray(OrderItem[]::new);
+                        OrderItem.createOrderItem(i, i.getPrice(), itemDtos.stream().filter(x -> x.getId().equals(i.getId())).findFirst().get().getCount())
+                ).toArray(OrderItem[]::new);
 
         Delivery delivery = new Delivery();
         delivery.setAddress(findUser.getAddress());
@@ -65,7 +65,7 @@ public class OrderService {
         orderRepository.save(order);
         userCoupon.setOrder(order);
         userCoupon.usedCoupon(); //[used :true, quantity -1]
-        cartService.deleteCartItem(findUser.getId(), itemId);
+        cartService.deleteCartItem(findUser.getId(), itemIds);
         return order.getId();
     }
 
@@ -73,17 +73,18 @@ public class OrderService {
      * 주문 - 쿠폰 할인X
      */
     @Transactional
-    public Long order(User user, int count, List<Long> itemId) {
+    public Long order(User user, List<ItemDto> itemDtos, List<Long> itemIds) {
 
         User findUser = userRepository.findById(user.getId())
                 .orElseThrow(NotFoundUserException::new);
 
-        List<Item> collect = itemId.stream().map(id ->
+        List<Item> collect = itemIds.stream().map(id ->
                 itemRepository.findById(id).orElseThrow(NotExistItemException::new))
                 .collect(Collectors.toList());
 
         OrderItem[] orderItems = collect.stream().map(i ->
-                OrderItem.createOrderItem(i, i.getPrice(), count))
+                OrderItem.createOrderItem(i, i.getPrice(), itemDtos.stream()
+                                .filter(x -> x.getId().equals(i.getId())).findFirst().get().getCount()))
                 .toArray(OrderItem[]::new);
 
         Delivery delivery = new Delivery();
@@ -92,7 +93,7 @@ public class OrderService {
         Order order = Order.createOrder(findUser, delivery, new NonDiscountPolicy(), orderItems);
 
         orderRepository.save(order);
-        cartService.deleteCartItem(findUser.getId(), itemId);
+        cartService.deleteCartItem(findUser.getId(), itemIds);
 
         return order.getId();
     }
@@ -121,6 +122,15 @@ public class OrderService {
             o.setOrderItems(orderItems);
         });
         return result;
+    }
+
+    public OrderDetailDto findOrder(Long orderId) {
+        Order result = orderRepository.findById(orderId)
+                .orElseThrow(NotExistItemException::new);
+        List<OrderItemDto> orderItems = orderRepository.findOrderItems(orderId);
+        OrderDetailDto orderDetailDto = new OrderDetailDto(result);
+        orderDetailDto.setOrderItems(orderItems);
+        return orderDetailDto;
     }
 
 }

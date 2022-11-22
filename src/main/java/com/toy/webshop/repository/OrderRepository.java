@@ -20,7 +20,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             " from Order o join o.user u join o.delivery d where  u.id =:userId")
     List<OrderDto> findOrders(@Param("userId") Long userId);
 
-    @Query("select new com.toy.webshop.dto.OrderItemDto(i.name, oi.orderPrice, oi.count)" +
+    @Query("select new com.toy.webshop.dto.OrderItemDto(i.id, i.name, oi.orderPrice, oi.count)" +
             " from OrderItem oi join oi.item i where oi.order.id =:orderId")
     List<OrderItemDto> findOrderItems(@Param("orderId") Long orderId);
 

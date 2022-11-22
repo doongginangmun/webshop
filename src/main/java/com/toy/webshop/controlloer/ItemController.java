@@ -1,14 +1,16 @@
 package com.toy.webshop.controlloer;
 
+import com.toy.webshop.dto.ItemDetailsDto;
 import com.toy.webshop.dto.ItemDto;
+import com.toy.webshop.dto.ReviewDto;
 import com.toy.webshop.entity.item.Book;
 import com.toy.webshop.entity.item.Item;
 import com.toy.webshop.form.BookForm;
 import com.toy.webshop.form.BookUpdateForm;
 import com.toy.webshop.repository.ItemSearchCondition;
 import com.toy.webshop.service.ItemService;
+import com.toy.webshop.service.ReviewService;
 import lombok.RequiredArgsConstructor;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,12 +22,14 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+
 @Slf4j
 @Controller
 @RequiredArgsConstructor
 public class ItemController {
 
     private final ItemService itemService;
+    private final ReviewService reviewService;
 
     /**
      * 상품 등록 폼 전송
@@ -51,7 +55,7 @@ public class ItemController {
         }
         Item item = form.toEntity();
         itemService.saveItem(item, form.getItemImgList());
-        return "redirect:/items";
+        return "redirect:/admin";
     }
 
     /**
@@ -122,5 +126,20 @@ public class ItemController {
         Page<ItemDto> itemDtos = itemService.itemSearch(condition, pageable);
         model.addAttribute("items", itemDtos);
         return "order/orderForm";
+    }
+    /**
+     *  아이템 상세 정보 페이지
+     */
+    @GetMapping("/item/detail/{itemId}")
+    public String itemDetail(@PathVariable("itemId") Long itemId,
+                             @PageableDefault(size = 3) Pageable pageable,
+                             Model model) {
+        ItemDto books = itemService.findBooks(itemId);
+
+        Page<ReviewDto> collect  = reviewService.findItemReviewAll(books.getName(), pageable).map(ReviewDto::new);
+
+        ItemDetailsDto itemDetails = new ItemDetailsDto(books, collect);
+        model.addAttribute("itemDetails", itemDetails);
+        return "items/itemDetail";
     }
 }

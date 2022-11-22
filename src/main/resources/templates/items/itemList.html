@@ -1,12 +1,11 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/header :: header" />
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/adminLayoutFile :: layout(~{::table}, ~{::link})}">
 <link rel="stylesheet" th:href="@{/css/itemList.css}">
 <body>
 <div class="container">
-    <div th:replace="fragments/bodyHeader :: bodyHeader"/>
     <div>
-        <table class="table table-striped">
+        <table class="table table-hover">
             <thead>
             <tr>
                 <th>#</th>
@@ -21,8 +20,11 @@
             <tbody class="item__wrapper">
             <tr th:each="item : ${items}">
                 <td th:text="${item.id}"></td>
-                <td><img class="thumbs__thumbnail"
+                <td>
+                    <a th:href="@{/item/detail/{id} (id=${item.id})}">
+                    <img class="thumbs__thumbnail"
                          th:each="img : ${item.itemImgs}" th:src="${img.imgUrl}"/>
+                    </a>
                 </td>
                 <td th:text="${item.name}"></td>
                 <td th:text="${item.price}"></td>
@@ -41,7 +43,6 @@
             </tbody>
         </table>
     </div>
-    <div th:replace="fragments/footer :: footer"/>
 </div> <!-- /container -->
 </body>
 </html>

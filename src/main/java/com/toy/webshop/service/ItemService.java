@@ -88,8 +88,11 @@ public class ItemService {
     public Item findOne(Long itemId) {
         return itemRepository.findById(itemId).orElseThrow(NotExistItemException::new);
     }
-
-    public List<Item> findPurchaseItems(List<Long> itemIds) {
-        return itemRepository.findPurchaseItems(itemIds);
+    public ItemDto findBooks(Long itemId) {
+        ItemDto books = itemRepository.findBooks(itemId);
+        List<ItemImgDto> itemImgs = itemImgService.findItemImgs(books.getId());
+        books.setItemImgs(itemImgs);
+        return books;
     }
+
 }

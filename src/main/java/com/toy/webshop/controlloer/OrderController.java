@@ -1,13 +1,11 @@
 package com.toy.webshop.controlloer;
 
 import com.toy.webshop.config.Login;
-import com.toy.webshop.dto.ItemDto;
-import com.toy.webshop.dto.OrderDto;
-import com.toy.webshop.dto.OrderRequestDto;
+import com.toy.webshop.dto.*;
 import com.toy.webshop.entity.User;
 import com.toy.webshop.entity.coupon.UserCoupon;
-import com.toy.webshop.entity.item.Item;
 import com.toy.webshop.repository.ItemSearchCondition;
+import com.toy.webshop.service.CartService;
 import com.toy.webshop.service.ItemService;
 import com.toy.webshop.service.OrderService;
 import com.toy.webshop.service.UserCouponService;
@@ -32,6 +30,7 @@ public class OrderController {
     private final ItemService itemService;
     private final OrderService orderService;
     private final UserCouponService userCouponService;
+    private final CartService cartService;
 
     /**
      * 판매중인 상품을 볼수있는 폼
@@ -62,14 +61,11 @@ public class OrderController {
            return "redirect:/items/cart";
        }
         List<Long> purchaseItemIds = Arrays.asList(chk);
-        List<Item> items = itemService.findPurchaseItems(purchaseItemIds);
+        List<CartItemDto> itemList = cartService.findOrderItems(purchaseItemIds, user)
+                .stream().map(CartItemDto::new).collect(Collectors.toList());
 
         List<UserCoupon> coupons = userCouponService.findMyCoupon(user);
-//        List<Coupon> coupons = couponService.findCouponList(user.getId());
 
-        List<ItemDto> itemList = items.stream()
-                .map(ItemDto::new)
-                .collect(Collectors.toList());
         model.addAttribute("itemList", itemList);
         model.addAttribute("coupons",coupons);
         model.addAttribute("OrderRequestForm", new OrderRequestDto());
@@ -85,14 +81,18 @@ public class OrderController {
     public String order(OrderRequestDto requestDto,
                         @Login User user,
                         RedirectAttributes redirectAttributes) {
-        if(requestDto.getChk().isEmpty() || requestDto.getChk().size()==0) {
+        if(requestDto.getItemDtos().isEmpty() || requestDto.getItemDtos().size()==0) {
             redirectAttributes.addFlashAttribute("msg", "주문할 상품은 한가지 이상 선택 해주세요.");
             return "redirect:/items/cart";
         }
+        List<Long> itemIds = requestDto.getItemDtos()
+                .stream()
+                .map(ItemDto::getId).collect(Collectors.toList());
+
         if(requestDto.getCouponId()==0)
-            orderService.order(user, 1, requestDto.getChk());
+            orderService.order(user, requestDto.getItemDtos(), itemIds);
         else
-            orderService.orderCoupon(user, 1, requestDto.getCouponId(), requestDto.getChk());
+            orderService.orderCoupon(user, requestDto.getItemDtos(), itemIds, requestDto.getCouponId());
         return "redirect:/";
     }
 
@@ -111,5 +111,15 @@ public class OrderController {
         log.info("id={}", id);
         orderService.cancelOrder(id);
         return "redirect:/orderList";
+    }
+
+    @GetMapping("/orderDetail/{orderId}")
+    public String orderDetails(@Login User user,
+                               @PathVariable Long orderId,
+                               Model model) {
+        OrderDetailDto order = orderService.findOrder(orderId);
+        log.info("order = {}", order);
+        model.addAttribute("order", order);
+        return "order/orderDetail";
     }
 }

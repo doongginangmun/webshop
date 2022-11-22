@@ -5,23 +5,33 @@ import com.toy.webshop.entity.User;
 import com.toy.webshop.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 @Transactional
 class UserServiceTest {
 
-    @Autowired
+    @Mock
     private UserRepository userRepository;
-    @Autowired
+    @Spy
+    @InjectMocks
     private UserService userService;
 
     @Test
@@ -34,12 +44,18 @@ class UserServiceTest {
                 .name("김두한")
                 .build();
         //when
-        Long saveId = userService.save(user);
+        doReturn(1L).when(userService).save(any(User.class));
+        when(userRepository.findById(any())).thenReturn(Optional.of(user));
+        Long save = userService.save(user);
+        Optional<User> user1 = userRepository.findById(save);
+
         //then
-        assertThat(saveId).isEqualTo(user.getId());
+        assertThat(user1.get().getEmail()).isEqualTo(user.getEmail());
+        verify(userService, times(1)).save(any());
+
     }
     @Test
-    @DisplayName("중복 회원 가입시 에러발생 해야한다.")
+    @DisplayName("이메일 중복 여부.")
     public void testcase2() {
         //given
         User user1 = User.builder()
@@ -47,18 +63,12 @@ class UserServiceTest {
                 .password("1234")
                 .name("김두한")
                 .build();
-
-        User user2 = User.builder()
-                .email("test@test.com")
-                .password("1234")
-                .name("김두한")
-                .build();
         //when
-        userService.save(user1);
+        doReturn(true).when(userService).validateDuplicateEmail(user1.getEmail());
+        boolean duplicateEmail = userService.validateDuplicateEmail(user1.getEmail());
 
-        assertThatThrownBy(() -> {
-            userService.save(user2);
-        }).isInstanceOf(IllegalStateException.class);
+        verify(userService, times(1)).validateDuplicateEmail(any());
+        assertThat(duplicateEmail).isTrue();
     }
 
     @Test
@@ -83,14 +93,11 @@ class UserServiceTest {
                 .name("김쿠키")
                 .build();
 
-        userService.save(user1);
-        userService.save(user2);
-        userService.save(user3);
+        List<User> userList1 = Arrays.asList(user1, user2, user3);
+        doReturn(userList1).when(userService).findAll();
         List<User> userList = userService.findAll();
-
         //then
-        assertThat(userList.size()).isEqualTo(5);
-
+        assertThat(userList.size()).isEqualTo(3);
     }
     @Test
     @DisplayName("auditing")
@@ -102,12 +109,12 @@ class UserServiceTest {
                 .name("김두한")
                 .build();
         //when
-        userService.save(user);
-        Optional<User> one = userRepository.findByEmail(user.getEmail());
+        doReturn(Optional.of(user)).when(userRepository).findByEmail(user.getEmail());
+        User byEmail = userRepository.findByEmail(user.getEmail()).get();
 
         //then
-        System.out.println(one.get().getCreatedAt());
-        assertThat(one.get().getCreatedAt()).isEqualTo(user.getCreatedAt());
+        System.out.println(byEmail.getCreatedAt());
+        assertThat(byEmail.getCreatedAt()).isEqualTo(user.getCreatedAt());
 
     }
 }

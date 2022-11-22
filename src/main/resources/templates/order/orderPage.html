@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/header :: header" />
+<head th:replace="fragments/header :: header(~{::link})">
 <link rel="stylesheet" th:href="@{/css/orderPage.css}">
 <link rel="stylesheet" th:href="@{/css/selectButton.css}">
 <body>
 <div class="container">
-    <div th:replace="fragments/bodyHeader :: bodyHeader"/>
         <div class="check__all">
             <div class="inner">
                 <div class="check__box">
@@ -23,10 +22,11 @@
         </div>
         <form th:action="@{/order}" id="orderForm" th:object="${OrderRequestForm}"  method="post">
             <div class="order_content">
-            <table class="table table-striped">
+            <table class="table table-boarded">
                 <thead>
                 <tr>
                     <th>#</th>
+                    <th>상품 번호</th>
                     <th>상품 이름</th>
                     <th>상품 주문가격</th>
                     <th>상품 주문수량</th>
@@ -36,11 +36,12 @@
                 <tr th:each="item : ${itemList}">
                     <td>
                         <input type="checkbox" class="chkbox" name="chk"
-                               th:field="*{chk}" th:value="${item.id}" th:onclick="selectChkBox(event)">
+                              th:value="${item.id}"  th:onclick="selectBox(event)">
                     </td>
-                        <td th:text="${item.name}"></td>
-                        <td id="itemPrice" th:text="${item.price}"></td>
-                        <td th:text="${item.count}"></td>
+                    <td th:text="${item.id}"></td>
+                        <td th:text="${item.itemName}"></td>
+                        <td id="itemPrice" th:text="${#numbers.formatInteger(item.price, 3, 'COMMA')}"></td>
+                        <td id="count" th:text="${item.count}"></td>
                 </tr>
                 </tbody>
             </table>
@@ -59,7 +60,7 @@
                         <!-- SELECT -->
                         <div>
                             <div>쿠폰</div>
-                            <select th:field="*{couponId}" class="form-select" th:onchange="handleOnChange(this)">
+                            <select class="form-select" th:field="*{couponId}" th:onchange="handleOnChange(this)">
                                 <option value="0">==보유 쿠폰 선택==</option>
                                 <option th:each="coupon : ${coupons}" th:value="${coupon.coupon.id}"
                                         th:text="${coupon.coupon.name}">name</option>
@@ -77,7 +78,7 @@
                                     <div class="price__area">
                                         <span class="title">총 할인금액</span>
                                         <em>
-                                            <span class="num" id="num">0 원</span>
+                                            <span class="num" id="num">-0 원</span>
                                         </em>
                                     </div>
                                 </div>
@@ -95,107 +96,186 @@
                 </div>
             </div>
             <div class="payment_agree_wrap">
-                <button class="btn_payment_doPayButton">결제하기</button>
+                <button class="btn_payment_doPayButton" id="btn1">결제하기</button>
             </div>
         </form>
 </div>
 </body>
 <script th:inline="javascript">
-const msg = [[${msg}]];
+var header = /*[[${_csrf.headerName}]]*/;
+var token = /*[[${_csrf.token}]]*/;
 const span = document.querySelector("span.check__");
 const path = document.querySelector("svg.ico__check:first-child path");
-const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-const result = [...checkboxes];
+const total = document.querySelector("#total_itemPrice");
 let num = document.querySelector("#num");
 let discountPrice = 0;
-let itemPrice = 0;
 
+ $(document).ready(function() {
+    $("#btn1").click(function(event) {
+            var form = document.getElementById('orderForm');
+			var chkbox = $("input[name=chk]:checked");
 
-/*쿠폰 할인 금액 가져오기*/
+ 	        // 체크된 체크박스 값을 가져온다
+			chkbox.each(function(i) {
+                var input1 = document.createElement('input');
+                var input2 = document.createElement('input');
+                var input3 = document.createElement('input');
+                var input4 = document.createElement('input');
+
+				// checkbox.parent() : checkbox의 부모는 <td>이다.
+				// checkbox.parent().parent() : <td>의 부모이므로 <tr>이다.
+				var tr = chkbox.parent().parent().eq(i);
+				var td = tr.children();
+
+				// td.eq(0)은 체크박스 이므로  td.eq(1)의 값부터 가져온다.
+				var id = td.eq(1).text();
+				var name = td.eq(2).text();
+				var price = stringToPrice(td.eq(3).text());
+				var count = td.eq(4).text();
+
+                input1.setAttribute("type", "hidden");
+                input1.setAttribute("name", "itemDtos[" + i + "].id");
+                input1.setAttribute("value", id);
+
+                input2.setAttribute("type", "hidden");
+                input2.setAttribute("name", "itemDtos[" + i + "].name");
+                input2.setAttribute("value", name);
+
+                input3.setAttribute("type", "hidden");
+                input3.setAttribute("name", "itemDtos[" + i + "].price");
+                input3.setAttribute("value", price);
+
+                input4.setAttribute("type", "hidden");
+                input4.setAttribute("name", "itemDtos[" + i + "].count");
+                input4.setAttribute("value", count);
+
+                form.appendChild(input1);
+                form.appendChild(input2);
+                form.appendChild(input3);
+                form.appendChild(input4);
+            });
+            form.submit();
+    });
+});
+document.addEventListener("DOMContentLoaded", () => {
+    const msg = [[${msg}]];
+    if(msg === '주문할 상품은 한가지 이상 선택 해주세요.') {
+        alert("주문할 상품은 한가지 이상 선택 해주세요.");
+    }
+});
+$('#total_itemPrice').on('DOMSubtreeModified', function() {
+      let dis = calcCoupon();
+      let total = stringToPrice($('#total_itemPrice').text()) - dis;
+      $('#total__price').text( priceFormat(total) );
+      $('#num').text( '-'+priceFormat(dis) );
+    });
+
+/* 전체 선택 button on/off */
+function selectAll() {
+    var checked = document.querySelectorAll('input[name="chk"]:checked');
+    var checkboxes = document.querySelectorAll('input[name="chk"]');
+    span.classList.toggle("clicked");
+    path.classList.toggle("path");
+
+    //체크 박스가 전부 선택되어 있을땐 전체 off
+    if(checked.length === checkboxes.length) {
+        checkboxes.forEach(input => {input.checked = false });
+        total.innerText = 0 + ' 원';
+    }else {
+        checkboxes.forEach(input => {input.checked = true });
+        let itemPrice = document.querySelectorAll("#itemPrice");
+        let count = document.querySelectorAll("#count");
+        let totalPrice = 0;
+        let formatTotalPrice = "";
+        for(var i=0; i<itemPrice.length; i++) {
+        let singleItemPrice = stringToPrice(itemPrice[i].innerText);
+            totalPrice += singleItemPrice * parseInt(count[i].innerText);
+        }
+    total.innerText = priceFormat(totalPrice);
+}
+}
+/*문자 -> 숫자 변환 ex) 10,000 -> 10000 */
+function stringToPrice(num) {
+    const regex = /[^0-9]/g;
+    const str = num;
+    let result = str.replace(regex, "");
+    let number = parseInt(result);
+    return number;
+}
+/*숫자 -> 문자 변환 ex) 10000 -> 10,000 원*/
+function priceFormat(p) {
+    return p.toLocaleString() + ' 원';
+}
+
+/* 상품 개별 체크박스 */
+function selectBox(event) {
+let newTotalPrice = 0;
+let loadTotalPrice = 0;
+let singleItemPrice = stringToPrice(event.path[2].cells[3].innerText);
+let totalItemPrice = stringToPrice(total.innerText);
+
+//checked 했을때 가격 계산
+if(event.target.checked) {
+    newTotalPrice = singleItemPrice * parseInt(event.path[2].cells[4].innerText) + totalItemPrice;
+    total.innerText = priceFormat(newTotalPrice);
+
+    var checked = document.querySelectorAll('input[name="chk"]:checked');
+    var checkboxes = document.querySelectorAll('input[name="chk"]');
+    //전부 체크 되었다면 전체 체크 활성화
+    if(checkboxes.length === checked.length) {
+        span.classList.add("clicked");
+        path.classList.add("path");
+    }
+} else {
+    //unChecked 가격 계산
+    newTotalPrice = totalItemPrice - (singleItemPrice * parseInt(event.path[2].cells[4].innerText));
+    total.innerText = priceFormat(newTotalPrice);
+
+    span.classList.remove("clicked");
+    path.classList.remove("path");
+  }
+}
+
+/*쿠폰 selectBox 변경시 summary totalPrice 변경*/
 function handleOnChange(e) {
+  //selectBox 에서 선택된 text에서 할인 숫자 추출
+  const result = stringToPrice(e.options[e.selectedIndex].text);
 
-  /*선택된 쿠폰 데이터의 텍스트에서 숫자만 추출*/
-  const text = e.options[e.selectedIndex].text;
-  let regex = /[^0-9]/g;
-  let result = parseInt(text.replace(regex, ""));
-
-  /* 쿠폰을 선택하지 않으면 0*/
+  //쿠폰을 선택하지 않으면 할인금액 0
   if(isNaN(result)==true) {
      discountPrice = 0;
   } else {
      discountPrice = result;
   }
-  calcInnerText(itemPrice);
+  calcSummaryText();
  }
+
  /*예상 할인 금액 계산*/
  function calcCoupon() {
-  if(itemPrice <= 0) {
+    let total = stringToPrice($('#total_itemPrice').text());
+  if(total <= 0) {
      return 0;
   }
   if(discountPrice > 100) {
      return discountPrice;
   }else {
-     return itemPrice/100.0 * discountPrice;
+     return total/100.0 * discountPrice;
   }
 }
 
-/*총 주문금액 = 총 상품선택금액 - 할인예상금액*/
-function calcTotalPrice(itemPrice, discountPrice) {
-    if(itemPrice-discountPrice<=0) {
+/*계산한 금액 화면에 출력*/
+function calcSummaryText() {
+    let temp = calcCoupon();
+    let total = stringToPrice($('#total_itemPrice').text());
+
+    //summary 할인 예상금액
+    num.innerText = (temp === 0) ?  '0 원' : '-' + priceFormat(temp);
+
+    //summary totalPrice
+    if(total-temp<=0) {
         total__price.innerText = '0 원';
     }else {
-        total__price.innerText = itemPrice - discountPrice + ' 원';
-    }
-}
-/*계산한 금액 화면에 출력*/
-function calcInnerText(itemPrice) {
-        let temp = calcCoupon();
-        total_itemPrice.innerText = itemPrice + ' 원';
-        num.innerText = (temp === 0) ?  '0 원' : '-' + temp + ' 원';
-        calcTotalPrice(itemPrice, temp);
-}
-if(msg === '주문할 상품은 한가지 이상 선택 해주세요.') {
-    alert("주문할 상품은 한가지 이상 선택 해주세요.");
-}
-
-/* 전체선택버튼 on/off */
-function selectAll(e) {
-    span.classList.toggle("clicked");
-    path.classList.toggle("path");
-    itemPrice = 0;
-    if(result.filter(box => box.checked).length === checkboxes.length) {
-        checkboxes.forEach(input => {input.checked = false });
-        calcInnerText(itemPrice);
-    } else {
-        checkboxes.forEach(input => {input.checked = true });
-        let itemPrices = document.querySelectorAll("#itemPrice");
-        let formatTotalPrice = "";
-        for(var i=0; i<itemPrices.length; i++) {
-            itemPrice += parseInt(itemPrices[i].innerText);
-        }
-        calcInnerText(itemPrice);
-    }
-}
-
-/* checkbox 선택시 전체선택버튼 on/off */
-function selectChkBox(event) {
-    let price = 0;
-    if(event.target.checked) {
-        price = parseInt(event.path[2].cells[2].innerText);
-        itemPrice += price;
-        calcInnerText(itemPrice);
-    } else {
-        price = parseInt(event.path[2].cells[2].innerText);
-        itemPrice -= price;
-        calcInnerText(itemPrice);
-    }
-
-    if(result.filter(box => box.checked).length != checkboxes.length) {
-       span.classList.remove("clicked");
-       path.classList.remove("path");
-    } else {
-        span.classList.add("clicked");
-        path.classList.add("path");
+        total__price.innerText = priceFormat(total - temp);
     }
 }
 </script >

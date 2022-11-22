@@ -29,10 +29,14 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     List<CartItemDto> findCartItems(@Param("cartId") Long cartId);
 
     @Query("select ci from CartItem ci where ci.cart.id =:cartId and ci.item.id in :itemIds")
-    List<CartItem> findDeleteCartItems(@Param("itemIds") Collection<Long> itemIds, @Param("cartId") Long cartId);
+    List<CartItem> findOrderCartItems(@Param("itemIds") Collection<Long> itemIds, @Param("cartId") Long cartId);
 
     @Modifying
     @Transactional
     @Query("delete from CartItem ci where ci.cart.id =:cartId and ci.item.id in :itemId")
     void delete(@Param("cartId")Long cartId, @Param("itemId") Collection<Long> itemId);
+
+    @Query("select count(*)" +
+            " from CartItem ci join ci.item i where ci.cart.id =:cartId")
+    Long countCartItems(@Param("cartId") Long cartId);
 }

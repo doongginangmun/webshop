@@ -1,7 +1,6 @@
 package com.toy.webshop.controlloer;
 
 
-import com.toy.webshop.config.Login;
 import com.toy.webshop.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;

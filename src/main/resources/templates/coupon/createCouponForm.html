@@ -1,6 +1,7 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/header :: header" />
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{admin/adminLayoutFile :: layout(~{::form}, ~{::link})}">
+<link rel="stylesheet" th:href="@{/css/createCouponForm.css}">
 <style>
  .fieldError {
  border-color: #bd2130;
@@ -8,8 +9,7 @@
 </style>
 <body>
 <div class="container">
-    <div th:replace="fragments/bodyHeader :: bodyHeader"/>
-    <form th:action="@{/coupon/new}" th:object="${form}" method="post">
+    <form class="flex-grow-1" th:action="@{/coupon/new}" th:object="${form}" method="post">
         <div class="form-group">
             <label th:for="name">쿠폰명</label>
             <input type="text" th:field="*{name}"
@@ -36,6 +36,7 @@
         </div>
         <div class="form-group">
             <div class="form-group mx-sm-1 mb-2">
+                <label th:for="couponType">타입</label>
                 <select th:field="*{couponType}" class="form-control">
                     <option value="">쿠폰할인타입</option>
                     <option th:each="couponType : ${T(com.toy.webshop.entity.coupon.CouponType).values()}"
@@ -46,8 +47,6 @@
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
-    <br/>
-    <div th:replace="fragments/footer :: footer" />
 </div> <!-- /container -->
 </body>
 </html>

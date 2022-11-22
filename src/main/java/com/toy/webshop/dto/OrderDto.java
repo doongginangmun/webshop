@@ -1,6 +1,7 @@
 package com.toy.webshop.dto;
 
 import com.toy.webshop.entity.Address;
+import com.toy.webshop.entity.Order;
 import com.toy.webshop.entity.OrderStatus;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,5 +25,13 @@ public class OrderDto {
         this.orderStatus = orderStatus;
         this.orderPrice = orderPrice;
         this.address = address;
+    }
+
+    public OrderDto(Order order) {
+        this.id = order.getId();
+        this.orderDate = order.getOrderDate();
+        this.orderStatus = order.getStatus();
+        this.orderPrice = order.getOrderPrice();
+        this.address = order.getDelivery().getAddress();
     }
 }
