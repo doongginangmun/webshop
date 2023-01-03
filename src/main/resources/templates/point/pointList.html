@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header(~{::link})">
+    <link rel="stylesheet" th:href="@{/css/couponIssued.css}">
+
+<body>
+<div class="container">
+
+    <p>마이 포인트</p>
+    <div>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>포인트</th>
+                <th>타입</th>
+                <th>경로</th>
+                <th>남은포인트</th>
+                <th>적립일</th>
+                <th>만료일</th>
+            </tr>
+            </thead>
+            <tbody class="point__wrapper">
+            <tr th:each="point : ${myPoint}">
+                <td th:text="${point.price}"></td>
+                <td th:text="${point.status}"></td>
+                <td th:text="${point.type}"></td>
+                <td th:text="${point.remainPoint}"></td>
+                <td th:text="${#temporals.format(point.createAt, 'yyyy년MM월dd일')}"></td>
+                <td th:text="${#temporals.format(point.expiredAt, 'yyyy년MM월dd일')}"></td>
+
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"/>
+</div> <!-- /container -->
+</body>
+</html>

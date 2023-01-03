@@ -62,7 +62,9 @@ public class UserController {
     public String signin() { return "users/signinForm"; }
 
     @GetMapping("/login-error")
-    public String loginError(Model model){
+    public String loginError(@RequestParam(value = "exception", required = false)String exception,
+                             Model model) {
+        model.addAttribute("exception", exception);
         model.addAttribute("loginError", true);
         return "users/signinForm";
     }

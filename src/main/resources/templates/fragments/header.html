@@ -52,7 +52,7 @@ color: #5a5a5a;
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
-                    <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                    <ul class="navbar-nav me-auto mb-2 mb-md-0 navbar-nav-scroll">
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="/">Home</a>
                         </li>
@@ -86,6 +86,7 @@ color: #5a5a5a;
                                             유저이름
                                         </a>
                                         <ul class="dropdown-menu dropdown-menu-primary" aria-labelledby="navbarDarkDropdownMenuLink">
+                                            <li><a class="dropdown-item" th:href="@{/point/{id}(id = ${#authentication.getPrincipal().getId()})}" sec:authorize="hasAuthority('ROLE_USER')">포인트</a></li>
                                             <li><a class="dropdown-item" href="/usercoupons" sec:authorize="hasAuthority('ROLE_USER')">쿠폰함</a></li>
                                             <li><a class="dropdown-item" href="/orderList"   sec:authorize="hasAuthority('ROLE_USER')">주문 내역</a></li>
                                             <li><form th:action="@{/logout}" method="post"   sec:authorize="isAuthenticated()"><button class="dropdown-item" type="submit">로그 아웃</button></form></li>
@@ -95,6 +96,7 @@ color: #5a5a5a;
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </nav>

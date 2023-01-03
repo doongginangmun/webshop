@@ -47,6 +47,132 @@
     background-position: 0 -10px;
 }
 
+.discount_info .list_discount {
+    display: table;
+    margin-top: 4px;
+    width: 100%;
+    table-layout: fixed;
+    line-height: 25px;
+}
+.list_discount .item_discount {
+    display: table-row;
+}
+.list_discount.type_point .point_balance {
+    padding-top: 15px;
+    line-height: 25px;
+}
+.list_discount .area_label {
+    display: table-cell;
+    width: 103px;
+    padding: 13px 0 0 36px;
+    letter-spacing: -0.5px;
+    vertical-align: top;
+}
+.list_discount.list_discount .area_item.point_balance {
+    padding-top: 13px;
+}
+.list_discount.type_point .point_balance {
+    padding-top: 15px;
+    line-height: 25px;
+}
+.list_discount .area_item {
+    display: table-cell;
+    padding-top: 13px;
+    vertical-align: top;
+}
+.list_discount.list_discount .area_item.point_balance {
+    padding-top: 13px;
+}
+.list_discount .point_balance .input_area {
+    width: 268px;
+}
+.list_discount .input_area {
+    position: relative;
+    float: left;
+    border-bottom: 1px solid #c8cacc;
+    text-align: right;
+    height: 28px;
+    line-height: 25px;
+    width: 268px;
+    padding-right: 5px;
+}
+.list_discount .input_area input, .list_discount .input_area .value {
+    float: left;
+    width: 110px;
+    height: 25px;
+    background: none;
+    border: 0;
+    line-height: 25px;
+    color: #1e1e23;
+    font-family: tahoma,geneva,sans-serif;
+    font-size: 14px;
+    text-align: right;
+}
+.list_discount .point_balance .input_area .value {
+    float: none;
+    margin-right: -1px;
+}
+.list_discount .input_area .measure {
+    display: inline-block;
+    margin: 1px 10px 0 0;
+    color: #1e1e23;
+    vertical-align: top;
+}
+.list_paymoney_balance {
+    float: left;
+    margin-left: 8px;
+}
+ul, ol {
+    list-style: none;
+}
+.list_paymoney_balance .item {
+    display: inline-block;
+    line-height: 26px;
+    color: #767678;
+    vertical-align: top;
+    font-family: '나눔고딕',NanumGothic,'맑은고딕',MalgunGothic,'돋움',Dotum,Helvetica,sans-serif;
+        font-size: 12px;
+}
+.list_discount .input_area input {
+    width: 232px;
+}
+input {
+    margin: 0;
+    padding: 0;
+}
+.btn.type_point.disable {
+    border-color: #dcdee0;
+    background-color: #f6f8fa;
+    color: #aaaaac;
+}
+.list_discount .btn {
+    float: left;
+    margin-left: 8px;
+    line-height: 12px;
+}
+.order_sc .btn {
+    width: 68px;
+    height: 26px;
+    border: 1px solid #dcdee0;
+    color: #303038;
+    background-color: #fff;
+    cursor: pointer;
+}
+button {
+    border: 0;
+    background: none;
+}
+.area_point_title {
+    position: relative;
+    margin-top: 21px;
+    padding-right: 78px;
+    width: 410px;
+}
+.req.type_paymoney {
+    width: 145px;
+    background-position: 0 -516px;
+}
+
 
 
 

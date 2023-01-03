@@ -57,6 +57,7 @@ public class User implements UserDetails {
         this.password = password;
         this.name = name;
         this.address = address;
+        this.enabled = isEnabled();
     }
 
     public User(long userId) {
@@ -82,4 +83,10 @@ public class User implements UserDetails {
     public boolean isCredentialsNonExpired() {
         return enabled;
     }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
 }

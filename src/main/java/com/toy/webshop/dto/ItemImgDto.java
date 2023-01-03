@@ -1,6 +1,5 @@
 package com.toy.webshop.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.querydsl.core.annotations.QueryProjection;
 import com.toy.webshop.entity.ItemImg;
 import lombok.Data;

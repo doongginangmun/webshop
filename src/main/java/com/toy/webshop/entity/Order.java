@@ -88,10 +88,4 @@ public class Order {
         if(coupon!=null)
             coupon.cancel();
     }
-
-    //할인된 주문 가격 조회
-    public int getDiscountOrderPrice() {
-       return discountPolicy.calculatePrice(this);
-    }
-
 }

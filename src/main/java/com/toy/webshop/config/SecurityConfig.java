@@ -4,6 +4,7 @@ import com.toy.webshop.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.token.KeyBasedPersistenceTokenService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
@@ -30,15 +32,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserLoginAuthenticationProvider userLoginAuthenticationProvider;
     private final DataSource dataSource;
 
-
-
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(userLoginAuthenticationProvider)
                 .userDetailsService(userService);
-
     }
-
+    @Bean
+    public AuthenticationFailureHandler getCustomFailureHandler() {
+        return new CustomAuthFailureHandler();
+    }
     @Bean
     public PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
@@ -64,7 +66,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests(request-> {
-                    request.antMatchers("/","/users/new", "/duplicate","/img/**").permitAll()
+                    request.antMatchers("/","/users/new", "/duplicate","/img/**", "/login-error").permitAll()
                             .antMatchers("/users").hasAuthority("ROLE_ADMIN")
                             .antMatchers("/admin","/coupon/new").hasAuthority("ROLE_ADMIN")
                             .antMatchers("/items/new", "/items", "/items/{itemId}/edit", "/items/{itemId}/delete").hasAuthority("ROLE_ADMIN")
@@ -76,7 +78,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                                  .loginProcessingUrl("/loginProcess")
                                  .permitAll()
                                  .defaultSuccessUrl("/", false)
-                                 .failureUrl("/login-error")
+                                 .failureHandler(getCustomFailureHandler())
                                  .authenticationDetailsSource(customDetails)
                                  .successHandler(new MyLoginSuccessHandler())
                 )

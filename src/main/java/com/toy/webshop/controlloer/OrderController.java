@@ -5,10 +5,7 @@ import com.toy.webshop.dto.*;
 import com.toy.webshop.entity.User;
 import com.toy.webshop.entity.coupon.UserCoupon;
 import com.toy.webshop.repository.ItemSearchCondition;
-import com.toy.webshop.service.CartService;
-import com.toy.webshop.service.ItemService;
-import com.toy.webshop.service.OrderService;
-import com.toy.webshop.service.UserCouponService;
+import com.toy.webshop.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
@@ -31,6 +28,7 @@ public class OrderController {
     private final OrderService orderService;
     private final UserCouponService userCouponService;
     private final CartService cartService;
+    private final PointService pointService;
 
     /**
      * 판매중인 상품을 볼수있는 폼
@@ -66,6 +64,9 @@ public class OrderController {
 
         List<UserCoupon> coupons = userCouponService.findMyCoupon(user);
 
+        int myPoint = pointService.getMyPoint(user.getId());
+
+        model.addAttribute("myPoint", myPoint);
         model.addAttribute("itemList", itemList);
         model.addAttribute("coupons",coupons);
         model.addAttribute("OrderRequestForm", new OrderRequestDto());
@@ -90,9 +91,9 @@ public class OrderController {
                 .map(ItemDto::getId).collect(Collectors.toList());
 
         if(requestDto.getCouponId()==0)
-            orderService.order(user, requestDto.getItemDtos(), itemIds);
+            orderService.order(user, requestDto.getItemDtos(), itemIds, requestDto.getPointPrice());
         else
-            orderService.orderCoupon(user, requestDto.getItemDtos(), itemIds, requestDto.getCouponId());
+            orderService.orderCoupon(user, requestDto.getItemDtos(), itemIds, requestDto.getCouponId(), requestDto.getPointPrice());
         return "redirect:/";
     }
 

@@ -71,5 +71,4 @@ public class AwsS3Service {
     private String getFileExtension(String fileName) {
             return fileName.substring(fileName.lastIndexOf("."));
     }
-
 }
